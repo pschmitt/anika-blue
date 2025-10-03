@@ -118,7 +118,7 @@
               cp app.py $out/share/anika-blue/
               cp -r templates $out/share/anika-blue/
 
-              cat > $out/bin/anika-blue <<'EOF'
+              cat > $out/bin/anika-blue <<EOF
               #!/usr/bin/env bash
               : "${"DATABASE:=$HOME/.local/share/anika-blue/anika_blue.db"}"
               mkdir -p "$(dirname "$DATABASE")"
