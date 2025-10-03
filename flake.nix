@@ -126,6 +126,7 @@
               cd "$out/share/anika-blue"
               exec "${pythonEnv}/bin/python" app.py "$@"
               EOF
+
               chmod +x $out/bin/anika-blue
             '';
 
