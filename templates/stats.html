@@ -1,0 +1,41 @@
+<div class="stats-container">
+    {% if user_avg %}
+    <div class="stat-item">
+        <div class="stat-label">Your Anika Blue</div>
+        <div class="stat-color">
+            <div class="color-swatch" style="background-color: {{ user_avg[0] }};"></div>
+            <div class="color-info">
+                <div class="color-hex">{{ user_avg[0] }}</div>
+                <div class="color-count">Based on {{ user_avg[1] }} choice{{ 's' if user_avg[1] != 1 else '' }}</div>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="stat-item">
+        <div class="stat-label">Your Anika Blue</div>
+        <div style="text-align: center; color: #999; padding: 20px;">
+            Make your first choice to see your Anika Blue!
+        </div>
+    </div>
+    {% endif %}
+
+    {% if global_avg %}
+    <div class="stat-item">
+        <div class="stat-label">Global Anika Blue</div>
+        <div class="stat-color">
+            <div class="color-swatch" style="background-color: {{ global_avg[0] }};"></div>
+            <div class="color-info">
+                <div class="color-hex">{{ global_avg[0] }}</div>
+                <div class="color-count">Based on {{ global_avg[1] }} choice{{ 's' if global_avg[1] != 1 else '' }} from all users</div>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="stat-item">
+        <div class="stat-label">Global Anika Blue</div>
+        <div style="text-align: center; color: #999; padding: 20px;">
+            Be the first to define Anika Blue!
+        </div>
+    </div>
+    {% endif %}
+</div>
