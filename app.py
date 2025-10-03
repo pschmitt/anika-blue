@@ -8,7 +8,7 @@ import os
 app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY', secrets.token_hex(32))
 
-DATABASE = 'anika_blue.db'
+DATABASE = os.environ.get('DATABASE', 'anika_blue.db')
 
 def init_db():
     conn = sqlite3.connect(DATABASE)
