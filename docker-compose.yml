@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   anika-blue:
     image: ghcr.io/pschmitt/anika-blue:latest
@@ -11,6 +9,7 @@ services:
     volumes:
       - anika-blue-data:/data
     environment:
+      # - DEBUG=1
       - SECRET_KEY=${SECRET_KEY:-change-me-in-production}
     restart: unless-stopped
     healthcheck:

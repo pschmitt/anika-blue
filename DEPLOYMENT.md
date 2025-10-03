@@ -25,7 +25,6 @@ Then visit http://localhost:5000
 1. Create a `docker-compose.yml` file (or use the one in this repo):
 
 ```yaml
-version: '3.8'
 services:
   anika-blue:
     image: ghcr.io/pschmitt/anika-blue:latest
@@ -56,8 +55,11 @@ docker run -p 5000:5000 -v anika-blue-data:/data anika-blue
 
 ### Environment Variables
 
+- `DEBUG`: If set this will enable the flask debug mode (default: unset)
 - `DATABASE`: Path to SQLite database file (default: `/data/anika_blue.db`)
 - `SECRET_KEY`: Flask secret key for sessions (auto-generated if not set)
+- `BIND_HOST`: Interface to listen on (default: `0.0.0.0`)
+- `BIND_PORT`: Port to start the service on (default: `5000`)
 
 ### Persistent Data
 
@@ -129,7 +131,7 @@ For NixOS users, add to your configuration:
 ```nix
 {
   inputs.anika-blue.url = "github:pschmitt/anika-blue";
-  
+
   outputs = { self, nixpkgs, anika-blue, ... }: {
     nixosConfigurations.yourhostname = nixpkgs.lib.nixosSystem {
       modules = [
@@ -137,6 +139,7 @@ For NixOS users, add to your configuration:
         {
           services.anika-blue = {
             enable = true;
+            bindHost = "0.0.0.0";
             port = 5000;
             dataDir = "/var/lib/anika-blue";
             # Optional: path to file containing secret key
@@ -240,7 +243,7 @@ Images are available at: `ghcr.io/pschmitt/anika-blue`
 ### Available Tags
 
 - `latest` - Latest stable version from main branch
-- `main` - Latest commit on main branch  
+- `main` - Latest commit on main branch
 - `vX.Y.Z` - Specific version tags
 - `X.Y` - Major.minor version
 - `X` - Major version

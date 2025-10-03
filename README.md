@@ -67,7 +67,7 @@ http://localhost:5000
 Run with Docker:
 
 ```bash
-# Using Docker Hub image (once published)
+# Using the image
 docker run -p 5000:5000 -v anika-blue-data:/data ghcr.io/pschmitt/anika-blue:latest
 
 # Or build locally
@@ -78,7 +78,6 @@ docker run -p 5000:5000 -v anika-blue-data:/data anika-blue
 With docker-compose:
 
 ```yaml
-version: '3.8'
 services:
   anika-blue:
     image: ghcr.io/pschmitt/anika-blue:latest
@@ -87,6 +86,7 @@ services:
     volumes:
       - anika-blue-data:/data
     environment:
+      # - DEBUG=1
       - SECRET_KEY=your-secret-key-here
     restart: unless-stopped
 
@@ -119,6 +119,7 @@ For NixOS users, add to your configuration:
 {
   services.anika-blue = {
     enable = true;
+    bindHost = "127.0.0.1";
     port = 5000;
     dataDir = "/var/lib/anika-blue";
   };
@@ -128,7 +129,7 @@ For NixOS users, add to your configuration:
 ## How It Works
 
 1. **View a Shade**: A random blue shade is presented to you
-2. **Make Your Choice**: 
+2. **Make Your Choice**:
    - Click "✓ Anika Blue" if you think it's Anika Blue
    - Click "❌ Not Anika Blue" if you don't think it's Anika Blue
    - Click "⏭️ Skip" to skip the shade
