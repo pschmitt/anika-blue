@@ -120,7 +120,7 @@
 
               cat > $out/bin/anika-blue <<EOF
               #!/usr/bin/env bash
-              : "${"DATABASE:=$HOME/.local/share/anika-blue/anika_blue.db"}"
+              export DATABASE="''${"DATABASE:-$HOME/.local/share/anika-blue/anika_blue.db"}"
               mkdir -p "$(dirname "$DATABASE")"
               export FLASK_APP="$out/share/anika-blue/app.py"
               cd "$out/share/anika-blue"
