@@ -1,4 +1,4 @@
-# Anika Blue 💙
+# Anika Blue 💙 FCK AFD
 
 An interactive web application to help you discover your perfect shade of blue! Inspired by Tinder's swipe interface, users can classify different shades of blue as "Anika Blue" or "Not Anika Blue".
 

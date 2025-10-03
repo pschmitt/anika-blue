@@ -299,6 +299,133 @@
             background: #f8d7da;
             color: #721c24;
         }
+
+        /* Toast notification styles */
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            border-radius: 10px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            z-index: 1000;
+            animation: slideIn 0.3s ease, slideOut 0.3s ease 4.7s;
+            max-width: 350px;
+        }
+
+        .toast.success {
+            background: #d4edda;
+            color: #155724;
+            border-left: 4px solid #28a745;
+        }
+
+        .toast.error {
+            background: #f8d7da;
+            color: #721c24;
+            border-left: 4px solid #dc3545;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideOut {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+        }
+
+        /* Footer styles */
+        .footer {
+            margin-top: 30px;
+            text-align: center;
+            color: white;
+            opacity: 0.8;
+            padding: 20px 0;
+        }
+
+        .footer a {
+            color: white;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: opacity 0.3s ease;
+        }
+
+        .footer a:hover {
+            opacity: 1;
+        }
+
+        .github-logo {
+            width: 24px;
+            height: 24px;
+            fill: white;
+        }
+
+        /* Card swipe animation */
+        @keyframes swipeLeft {
+            from {
+                transform: translateX(0) rotate(0deg);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(-150%) rotate(-30deg);
+                opacity: 0;
+            }
+        }
+
+        @keyframes swipeRight {
+            from {
+                transform: translateX(0) rotate(0deg);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(150%) rotate(30deg);
+                opacity: 0;
+            }
+        }
+
+        @keyframes slideInNew {
+            from {
+                transform: translateY(50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .swipe-left {
+            animation: swipeLeft 0.4s ease-out;
+        }
+
+        .swipe-right {
+            animation: swipeRight 0.4s ease-out;
+        }
+
+        .slide-in-new {
+            animation: slideInNew 0.4s ease-out;
+        }
+
+        #shade-container {
+            position: relative;
+        }
     </style>
 </head>
 <body>
@@ -323,6 +450,15 @@
             <button class="load-color-btn" onclick="loadBaseColor()">🔄 Load My Color</button>
             <div id="load-message"></div>
         </div>
+
+        <div class="footer">
+            <a href="https://github.com/pschmitt/anika-blue" target="_blank" rel="noopener noreferrer">
+                <svg class="github-logo" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                </svg>
+                <span>View on GitHub</span>
+            </a>
+        </div>
     </div>
 
     <script>
@@ -332,7 +468,14 @@
             try {
                 const response = await fetch('/next-shade');
                 const html = await response.text();
-                document.getElementById('shade-container').innerHTML = html;
+                const shadeContainer = document.getElementById('shade-container');
+                shadeContainer.innerHTML = html;
+                
+                // Add slide-in animation
+                shadeContainer.classList.add('slide-in-new');
+                setTimeout(() => {
+                    shadeContainer.classList.remove('slide-in-new');
+                }, 400);
                 
                 // Extract the shade from the response
                 const tempDiv = document.createElement('div');
@@ -364,6 +507,14 @@
             if (!hexMatch) return;
             
             const shade = hexMatch.textContent.trim();
+            const shadeContainer = document.getElementById('shade-container');
+            
+            // Add swipe animation based on choice
+            if (choice === 'yes') {
+                shadeContainer.classList.add('swipe-right');
+            } else if (choice === 'no') {
+                shadeContainer.classList.add('swipe-left');
+            }
             
             const formData = new FormData();
             formData.append('shade', shade);
@@ -380,10 +531,11 @@
                 // Update favicon after voting
                 updateFavicon();
                 
-                // Load next shade after a brief delay
+                // Load next shade after animation completes
                 setTimeout(() => {
+                    shadeContainer.classList.remove('swipe-left', 'swipe-right');
                     loadNextShade();
-                }, 300);
+                }, 400);
             } catch (error) {
                 console.error('Error voting:', error);
             }
@@ -486,12 +638,17 @@
         }
 
         function showMessage(elementId, message, type) {
-            const messageDiv = document.getElementById(elementId);
-            messageDiv.innerHTML = `<div class="message ${type}">${message}</div>`;
+            // Create toast element
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.textContent = message;
             
-            // Clear message after 5 seconds
+            // Add to body
+            document.body.appendChild(toast);
+            
+            // Remove after animation completes
             setTimeout(() => {
-                messageDiv.innerHTML = '';
+                toast.remove();
             }, 5000);
         }
 
