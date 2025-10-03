@@ -80,7 +80,7 @@
                   DATABASE = "${cfg.dataDir}/anika_blue.db";
                   FLASK_APP = "${pkg}/share/anika-blue/app.py";
                   BIND_HOST = "${cfg.bindHost}";
-                  BIND_PORT = "${cfg.port}";
+                  BIND_PORT = "${toString cfg.port}";
                 }
                 // lib.optionalAttrs (cfg.secretKeyFile != null) {
                   SECRET_KEY_FILE = cfg.secretKeyFile;
