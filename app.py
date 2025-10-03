@@ -37,6 +37,14 @@ def init_db():
                   timestamp DATETIME DEFAULT CURRENT_TIMESTAMP)"""
     )
 
+    # Table for user base colors (for cross-session/device identification)
+    c.execute(
+        """CREATE TABLE IF NOT EXISTS user_base_colors
+                 (user_id TEXT PRIMARY KEY,
+                  base_color TEXT NOT NULL,
+                  timestamp DATETIME DEFAULT CURRENT_TIMESTAMP)"""
+    )
+
     conn.commit()
     conn.close()
 
@@ -135,6 +143,45 @@ def get_global_average():
     return f"#{avg_r:02x}{avg_g:02x}{avg_b:02x}", count
 
 
+def get_user_base_color(user_id):
+    """Get the saved base color for a user"""
+    conn = get_db()
+    c = conn.cursor()
+    c.execute(
+        "SELECT base_color FROM user_base_colors WHERE user_id = ?",
+        (user_id,)
+    )
+    result = c.fetchone()
+    conn.close()
+    return result["base_color"] if result else None
+
+
+def set_user_base_color(user_id, base_color):
+    """Save the base color for a user"""
+    conn = get_db()
+    c = conn.cursor()
+    c.execute(
+        """INSERT OR REPLACE INTO user_base_colors (user_id, base_color)
+           VALUES (?, ?)""",
+        (user_id, base_color)
+    )
+    conn.commit()
+    conn.close()
+
+
+def find_user_by_base_color(base_color):
+    """Find a user_id by their base color"""
+    conn = get_db()
+    c = conn.cursor()
+    c.execute(
+        "SELECT user_id FROM user_base_colors WHERE base_color = ?",
+        (base_color,)
+    )
+    result = c.fetchone()
+    conn.close()
+    return result["user_id"] if result else None
+
+
 @app.route("/")
 @ensure_user_id
 def index():
@@ -194,6 +241,41 @@ def stats():
     global_avg = get_global_average()
 
     return render_template("stats.html", user_avg=user_avg, global_avg=global_avg)
+
+
+@app.route("/save-base-color", methods=["POST"])
+@ensure_user_id
+def save_base_color():
+    """Save the current user's base color"""
+    user_avg = get_user_average(session["user_id"])
+    
+    if user_avg:
+        base_color = user_avg[0]
+        set_user_base_color(session["user_id"], base_color)
+        return jsonify({"success": True, "base_color": base_color})
+    
+    return jsonify({"success": False, "error": "No average color available"}), 400
+
+
+@app.route("/load-base-color", methods=["POST"])
+def load_base_color():
+    """Load a user session by their base color"""
+    base_color = request.form.get("base_color", "").strip()
+    
+    if not base_color:
+        return jsonify({"success": False, "error": "No base color provided"}), 400
+    
+    # Validate hex color format
+    if not base_color.startswith("#") or len(base_color) != 7:
+        return jsonify({"success": False, "error": "Invalid hex color format"}), 400
+    
+    user_id = find_user_by_base_color(base_color)
+    
+    if user_id:
+        session["user_id"] = user_id
+        return jsonify({"success": True, "message": "Session restored successfully"})
+    
+    return jsonify({"success": False, "error": "No user found with this base color"}), 404
 
 
 if __name__ == "__main__":

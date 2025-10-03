@@ -182,6 +182,93 @@
         .htmx-settling {
             opacity: 1;
         }
+
+        .save-color-btn {
+            width: 100%;
+            margin-top: 10px;
+            padding: 10px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .save-color-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+
+        .load-color-section {
+            margin-top: 20px;
+            background: rgba(255,255,255,0.95);
+            border-radius: 15px;
+            padding: 20px;
+        }
+
+        .load-color-title {
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .load-color-input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-family: 'Courier New', monospace;
+            margin-bottom: 10px;
+            transition: border-color 0.3s ease;
+        }
+
+        .load-color-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .load-color-btn {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .load-color-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+
+        .message {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            text-align: center;
+        }
+
+        .message.success {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .message.error {
+            background: #f8d7da;
+            color: #721c24;
+        }
     </style>
 </head>
 <body>
@@ -198,6 +285,13 @@
         </div>
 
         <div id="stats-container">
+        </div>
+
+        <div class="load-color-section">
+            <div class="load-color-title">Restore Your Session</div>
+            <input type="text" id="base-color-input" class="load-color-input" placeholder="#1a2b3c" maxlength="7">
+            <button class="load-color-btn" onclick="loadBaseColor()">🔄 Load My Color</button>
+            <div id="load-message"></div>
         </div>
     </div>
 
@@ -270,6 +364,71 @@
             if (yesBtn) yesBtn.addEventListener('click', () => vote('yes'));
             if (noBtn) noBtn.addEventListener('click', () => vote('no'));
             if (skipBtn) skipBtn.addEventListener('click', () => vote('skip'));
+        }
+
+        async function saveBaseColor() {
+            try {
+                const response = await fetch('/save-base-color', {
+                    method: 'POST'
+                });
+                const data = await response.json();
+                
+                if (data.success) {
+                    // Copy to clipboard
+                    await navigator.clipboard.writeText(data.base_color);
+                    showMessage('load-message', `Color ${data.base_color} saved and copied to clipboard!`, 'success');
+                } else {
+                    showMessage('load-message', data.error || 'Failed to save color', 'error');
+                }
+            } catch (error) {
+                console.error('Error saving base color:', error);
+                showMessage('load-message', 'Error saving color', 'error');
+            }
+        }
+
+        async function loadBaseColor() {
+            const baseColor = document.getElementById('base-color-input').value.trim();
+            
+            if (!baseColor) {
+                showMessage('load-message', 'Please enter a color hex code', 'error');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('base_color', baseColor);
+
+            try {
+                const response = await fetch('/load-base-color', {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await response.json();
+                
+                if (data.success) {
+                    showMessage('load-message', 'Session restored! Reloading...', 'success');
+                    // Reload stats and shade after a brief delay
+                    setTimeout(() => {
+                        loadStats();
+                        loadNextShade();
+                        document.getElementById('base-color-input').value = '';
+                    }, 1000);
+                } else {
+                    showMessage('load-message', data.error || 'Failed to load color', 'error');
+                }
+            } catch (error) {
+                console.error('Error loading base color:', error);
+                showMessage('load-message', 'Error loading color', 'error');
+            }
+        }
+
+        function showMessage(elementId, message, type) {
+            const messageDiv = document.getElementById(elementId);
+            messageDiv.innerHTML = `<div class="message ${type}">${message}</div>`;
+            
+            // Clear message after 5 seconds
+            setTimeout(() => {
+                messageDiv.innerHTML = '';
+            }, 5000);
         }
 
         // Initialize on load
