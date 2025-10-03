@@ -5,7 +5,7 @@ from functools import wraps
 import secrets
 import os
 from io import BytesIO
-from PIL import Image, ImageDraw
+from PIL import Image
 
 app = Flask(__name__)
 app.secret_key = os.environ.get("SECRET_KEY", secrets.token_hex(32))
