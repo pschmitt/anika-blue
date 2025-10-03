@@ -13,6 +13,25 @@ An interactive web application to help you discover your perfect shade of blue! 
 
 ## Getting Started
 
+### Quick Start Options
+
+1. **Docker** (Recommended for production):
+   ```bash
+   docker run -p 5000:5000 -v anika-blue-data:/data ghcr.io/pschmitt/anika-blue:latest
+   ```
+
+2. **Nix** (Reproducible builds):
+   ```bash
+   nix run github:pschmitt/anika-blue
+   ```
+
+3. **Python** (Development):
+   ```bash
+   pip install -r requirements.txt && python app.py
+   ```
+
+See [DEPLOYMENT.md](DEPLOYMENT.md) for detailed deployment instructions.
+
 ### Prerequisites
 
 - Python 3.7 or higher
