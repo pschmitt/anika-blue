@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anika Blue</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 500px;
+            width: 100%;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .card-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .shade-display {
+            width: 100%;
+            height: 400px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            transition: background-color 0.3s ease;
+        }
+
+        .hex-code {
+            background: rgba(255,255,255,0.9);
+            padding: 15px 30px;
+            border-radius: 30px;
+            font-size: 2rem;
+            font-weight: bold;
+            font-family: 'Courier New', monospace;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            margin-top: 20px;
+        }
+
+        .controls {
+            padding: 30px;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        button {
+            flex: 1;
+            padding: 15px 20px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .btn-yes {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-no {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+        }
+
+        .btn-skip {
+            background: #e0e0e0;
+            color: #666;
+        }
+
+        .stats-container {
+            margin-top: 30px;
+            background: rgba(255,255,255,0.95);
+            border-radius: 15px;
+            padding: 20px;
+        }
+
+        .stat-item {
+            margin-bottom: 20px;
+        }
+
+        .stat-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 8px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .stat-color {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .color-swatch {
+            width: 60px;
+            height: 60px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+
+        .color-info {
+            flex: 1;
+        }
+
+        .color-hex {
+            font-size: 1.3rem;
+            font-weight: bold;
+            font-family: 'Courier New', monospace;
+            margin-bottom: 4px;
+        }
+
+        .color-count {
+            font-size: 0.9rem;
+            color: #999;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 30px;
+            color: #999;
+        }
+
+        .htmx-swapping {
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .htmx-settling {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>💙 Anika Blue 💙</h1>
+            <p>Find your perfect shade of blue</p>
+        </div>
+
+        <div class="card-container" id="card-container">
+            <div id="shade-container">
+                <div class="loading">Loading...</div>
+            </div>
+        </div>
+
+        <div id="stats-container">
+        </div>
+    </div>
+
+    <script>
+        let currentShade = null;
+
+        async function loadNextShade() {
+            try {
+                const response = await fetch('/next-shade');
+                const html = await response.text();
+                document.getElementById('shade-container').innerHTML = html;
+                
+                // Extract the shade from the response
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = html;
+                const shadeElement = tempDiv.querySelector('.shade-display');
+                if (shadeElement) {
+                    currentShade = shadeElement.style.backgroundColor;
+                }
+                
+                // Attach button listeners
+                attachButtonListeners();
+            } catch (error) {
+                console.error('Error loading shade:', error);
+            }
+        }
+
+        async function loadStats() {
+            try {
+                const response = await fetch('/stats');
+                const html = await response.text();
+                document.getElementById('stats-container').innerHTML = html;
+            } catch (error) {
+                console.error('Error loading stats:', error);
+            }
+        }
+
+        async function vote(choice) {
+            const hexMatch = document.querySelector('.hex-code');
+            if (!hexMatch) return;
+            
+            const shade = hexMatch.textContent.trim();
+            
+            const formData = new FormData();
+            formData.append('shade', shade);
+            formData.append('choice', choice);
+
+            try {
+                const response = await fetch('/vote', {
+                    method: 'POST',
+                    body: formData
+                });
+                const html = await response.text();
+                document.getElementById('stats-container').innerHTML = html;
+                
+                // Load next shade after a brief delay
+                setTimeout(() => {
+                    loadNextShade();
+                }, 300);
+            } catch (error) {
+                console.error('Error voting:', error);
+            }
+        }
+
+        function attachButtonListeners() {
+            const yesBtn = document.querySelector('.btn-yes');
+            const noBtn = document.querySelector('.btn-no');
+            const skipBtn = document.querySelector('.btn-skip');
+
+            if (yesBtn) yesBtn.addEventListener('click', () => vote('yes'));
+            if (noBtn) noBtn.addEventListener('click', () => vote('no'));
+            if (skipBtn) skipBtn.addEventListener('click', () => vote('skip'));
+        }
+
+        // Initialize on load
+        document.addEventListener('DOMContentLoaded', () => {
+            loadNextShade();
+            loadStats();
+        });
+    </script>
+</body>
+</html>
