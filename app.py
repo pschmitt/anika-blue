@@ -1,9 +1,11 @@
 import random
 import sqlite3
-from flask import Flask, render_template, request, session, jsonify
+from flask import Flask, render_template, request, session, jsonify, send_file
 from functools import wraps
 import secrets
 import os
+from io import BytesIO
+from PIL import Image, ImageDraw
 
 app = Flask(__name__)
 app.secret_key = os.environ.get("SECRET_KEY", secrets.token_hex(32))
@@ -276,6 +278,44 @@ def load_base_color():
         return jsonify({"success": True, "message": "Session restored successfully"})
     
     return jsonify({"success": False, "error": "No user found with this base color"}), 404
+
+
+@app.route("/favicon.ico")
+def favicon():
+    """Generate a dynamic favicon based on user's Anika Blue color"""
+    # Get user ID from session if available
+    user_id = session.get("user_id")
+    
+    # Determine which color to use
+    color = None
+    if user_id:
+        user_avg = get_user_average(user_id)
+        if user_avg:
+            color = user_avg[0]
+    
+    # If no user color, use global average
+    if not color:
+        global_avg = get_global_average()
+        if global_avg:
+            color = global_avg[0]
+        else:
+            # Default to a nice blue if no data exists
+            color = "#667eea"
+    
+    # Convert hex to RGB
+    r = int(color[1:3], 16)
+    g = int(color[3:5], 16)
+    b = int(color[5:7], 16)
+    
+    # Create a simple square favicon
+    img = Image.new('RGB', (32, 32), color=(r, g, b))
+    
+    # Save to BytesIO
+    img_io = BytesIO()
+    img.save(img_io, 'ICO')
+    img_io.seek(0)
+    
+    return send_file(img_io, mimetype='image/x-icon')
 
 
 if __name__ == "__main__":

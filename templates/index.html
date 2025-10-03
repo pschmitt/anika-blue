@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Anika Blue</title>
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
     <style>
         * {
             margin: 0;
@@ -98,6 +99,35 @@
 
         button:active {
             transform: translateY(0);
+            animation: button-pulse 0.3s ease;
+        }
+
+        @keyframes button-pulse {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(0.95);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        @keyframes button-success {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        .animate-success {
+            animation: button-success 0.4s ease;
         }
 
         .btn-yes {
@@ -347,6 +377,9 @@
                 const html = await response.text();
                 document.getElementById('stats-container').innerHTML = html;
                 
+                // Update favicon after voting
+                updateFavicon();
+                
                 // Load next shade after a brief delay
                 setTimeout(() => {
                     loadNextShade();
@@ -361,13 +394,29 @@
             const noBtn = document.querySelector('.btn-no');
             const skipBtn = document.querySelector('.btn-skip');
 
-            if (yesBtn) yesBtn.addEventListener('click', () => vote('yes'));
-            if (noBtn) noBtn.addEventListener('click', () => vote('no'));
-            if (skipBtn) skipBtn.addEventListener('click', () => vote('skip'));
+            if (yesBtn) yesBtn.addEventListener('click', (e) => {
+                e.target.classList.add('animate-success');
+                setTimeout(() => e.target.classList.remove('animate-success'), 400);
+                vote('yes');
+            });
+            if (noBtn) noBtn.addEventListener('click', (e) => {
+                e.target.classList.add('animate-success');
+                setTimeout(() => e.target.classList.remove('animate-success'), 400);
+                vote('no');
+            });
+            if (skipBtn) skipBtn.addEventListener('click', (e) => {
+                e.target.classList.add('animate-success');
+                setTimeout(() => e.target.classList.remove('animate-success'), 400);
+                vote('skip');
+            });
         }
 
         async function saveBaseColor() {
             try {
+                const saveBtn = event.target;
+                saveBtn.classList.add('animate-success');
+                setTimeout(() => saveBtn.classList.remove('animate-success'), 400);
+                
                 const response = await fetch('/save-base-color', {
                     method: 'POST'
                 });
@@ -377,6 +426,8 @@
                     // Copy to clipboard
                     await navigator.clipboard.writeText(data.base_color);
                     showMessage('load-message', `Color ${data.base_color} saved and copied to clipboard!`, 'success');
+                    // Update favicon after saving
+                    updateFavicon();
                 } else {
                     showMessage('load-message', data.error || 'Failed to save color', 'error');
                 }
@@ -394,6 +445,10 @@
                 return;
             }
 
+            const loadBtn = event.target;
+            loadBtn.classList.add('animate-success');
+            setTimeout(() => loadBtn.classList.remove('animate-success'), 400);
+
             const formData = new FormData();
             formData.append('base_color', baseColor);
 
@@ -410,6 +465,7 @@
                     setTimeout(() => {
                         loadStats();
                         loadNextShade();
+                        updateFavicon();
                         document.getElementById('base-color-input').value = '';
                     }, 1000);
                 } else {
@@ -418,6 +474,14 @@
             } catch (error) {
                 console.error('Error loading base color:', error);
                 showMessage('load-message', 'Error loading color', 'error');
+            }
+        }
+
+        function updateFavicon() {
+            // Force favicon refresh by adding a timestamp
+            const link = document.querySelector("link[rel='icon']");
+            if (link) {
+                link.href = '/favicon.ico?' + new Date().getTime();
             }
         }
 
