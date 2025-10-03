@@ -38,6 +38,18 @@
             options.services.anika-blue = {
               enable = lib.mkEnableOption "Anika Blue service";
 
+              debug = lib.mkOption {
+                type = lib.types.bool;
+                default = false;
+                description = "Enable debug mode";
+              };
+
+              bindHost = lib.mkOption {
+                type = lib.types.str;
+                default = "0.0.0.0";
+                description = "Host to bind the service to";
+              };
+
               port = lib.mkOption {
                 type = lib.types.port;
                 default = 5000;
@@ -64,8 +76,11 @@
                 after = [ "network.target" ];
 
                 environment = {
+                  DEBUG = if cfg.debug then "1" else "";
                   DATABASE = "${cfg.dataDir}/anika_blue.db";
                   FLASK_APP = "${pkg}/share/anika-blue/app.py";
+                  BIND_HOST = "${cfg.bindHost}";
+                  BIND_PORT = "${cfg.port}";
                 }
                 // lib.optionalAttrs (cfg.secretKeyFile != null) {
                   SECRET_KEY_FILE = cfg.secretKeyFile;

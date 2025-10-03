@@ -8,7 +8,10 @@ import os
 app = Flask(__name__)
 app.secret_key = os.environ.get("SECRET_KEY", secrets.token_hex(32))
 
+DEBUG = os.environ.get("DEBUG") is not None
 DATABASE = os.environ.get("DATABASE", "anika_blue.db")
+BIND_HOST = os.environ.get("BIND_HOST", "0.0.0.0")
+BIND_PORT = int(os.environ.get("BIND_PORT", 5000))
 
 
 def init_db():
@@ -195,4 +198,4 @@ def stats():
 
 if __name__ == "__main__":
     init_db()
-    app.run(debug=True, host="0.0.0.0", port=5000)
+    app.run(debug=DEBUG, host=BIND_HOST, port=BIND_PORT)
