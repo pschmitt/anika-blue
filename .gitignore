@@ -8,3 +8,8 @@ env/
 .DS_Store
 *.sqlite
 *.sqlite3
+
+# Nix
+result
+result-*
+.direnv/

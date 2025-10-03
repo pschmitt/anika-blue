@@ -13,10 +13,31 @@ An interactive web application to help you discover your perfect shade of blue! 
 
 ## Getting Started
 
+### Quick Start Options
+
+1. **Docker** (Recommended for production):
+   ```bash
+   docker run -p 5000:5000 -v anika-blue-data:/data ghcr.io/pschmitt/anika-blue:latest
+   ```
+
+2. **Nix** (Reproducible builds):
+   ```bash
+   nix run github:pschmitt/anika-blue
+   ```
+
+3. **Python** (Development):
+   ```bash
+   pip install -r requirements.txt && python app.py
+   ```
+
+See [DEPLOYMENT.md](DEPLOYMENT.md) for detailed deployment instructions.
+
 ### Prerequisites
 
 - Python 3.7 or higher
 - pip
+
+Or use one of the alternative deployment methods below (Docker or Nix).
 
 ### Installation
 
@@ -39,6 +60,69 @@ python app.py
 4. Open your browser and navigate to:
 ```
 http://localhost:5000
+```
+
+### Docker
+
+Run with Docker:
+
+```bash
+# Using Docker Hub image (once published)
+docker run -p 5000:5000 -v anika-blue-data:/data ghcr.io/pschmitt/anika-blue:latest
+
+# Or build locally
+docker build -t anika-blue .
+docker run -p 5000:5000 -v anika-blue-data:/data anika-blue
+```
+
+With docker-compose:
+
+```yaml
+version: '3.8'
+services:
+  anika-blue:
+    image: ghcr.io/pschmitt/anika-blue:latest
+    ports:
+      - "5000:5000"
+    volumes:
+      - anika-blue-data:/data
+    environment:
+      - SECRET_KEY=your-secret-key-here
+    restart: unless-stopped
+
+volumes:
+  anika-blue-data:
+```
+
+### Nix/NixOS
+
+With Nix flakes enabled:
+
+```bash
+# Run directly
+nix run github:pschmitt/anika-blue
+
+# Enter development shell
+nix develop
+
+# Build the package
+nix build
+
+# Build Docker image with Nix
+nix build .#docker
+docker load < result
+```
+
+For NixOS users, add to your configuration:
+
+```nix
+{
+  services.anika-blue = {
+    enable = true;
+    port = 5000;
+    dataDir = "/var/lib/anika-blue";
+  };
+}
 ```
 
 ## How It Works
