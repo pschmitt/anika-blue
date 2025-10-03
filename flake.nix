@@ -120,11 +120,11 @@
 
               cat > $out/bin/anika-blue <<EOF
               #!/usr/bin/env bash
-              export DATABASE="''${DATABASE:-''$HOME/.local/share/anika-blue/anika_blue.db}"
-              mkdir -p "$(dirname "$DATABASE")"
+              export DATABASE="\''${DATABASE:\$HOME/.local/share/anika-blue/anika_blue.db}"
+              mkdir -p "\$(dirname "\$DATABASE")"
               export FLASK_APP="$out/share/anika-blue/app.py"
               cd "$out/share/anika-blue"
-              exec "${pythonEnv}/bin/python" app.py "$@"
+              exec "${pythonEnv}/bin/python" app.py "\$@"
               EOF
 
               chmod +x $out/bin/anika-blue
