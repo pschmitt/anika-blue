@@ -218,8 +218,12 @@
               echo "Python: $(python --version)"
               echo "Flask: $(python -c 'import flask; print(flask.__version__)')"
               echo
-              echo "Run 'python app.py' to start the development server"
-              echo "Run 'nix build .#docker' to build Docker image"
+              echo "Commands:"
+              echo "  python app.py          - Start development server"
+              echo "  pytest tests/ -v       - Run tests"
+              echo "  black .                - Format code"
+              echo "  flake8 app.py tests/   - Lint code"
+              echo "  nix build .#docker     - Build Docker image"
               echo
               export DATABASE="''${DATABASE:-$PWD/anika_blue.db}"
               export FLASK_APP="$PWD/app.py"

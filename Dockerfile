@@ -4,17 +4,19 @@ FROM python:3.12-slim
 # Set working directory
 WORKDIR /app
 
-# Install system dependencies
+# Install system dependencies including uv
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
-    sqlite3 && \
+    sqlite3 \
+    curl && \
+    curl -LsSf https://astral.sh/uv/install.sh | sh && \
     rm -rf /var/lib/apt/lists/*
 
-# Copy requirements first for better caching
-COPY requirements.txt .
+# Copy pyproject.toml
+COPY pyproject.toml .
 
-# Install Python dependencies
-RUN pip install --no-cache-dir -r requirements.txt
+# Install Python dependencies using uv
+RUN /root/.cargo/bin/uv pip install --system flask pillow
 
 # Copy application files
 COPY app.py .

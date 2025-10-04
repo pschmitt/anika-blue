@@ -198,7 +198,12 @@ source venv/bin/activate  # On Windows: venv\Scripts\activate
 
 3. Install dependencies:
 ```bash
-pip install -r requirements.txt
+# Using uv (recommended)
+pip install uv
+uv pip install flask pillow
+
+# Or using pip directly  
+pip install flask pillow
 ```
 
 4. Run the application:
