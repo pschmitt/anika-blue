@@ -217,7 +217,7 @@
               echo "  pytest tests/ -v        - Run tests"
               echo "  black .                 - Format code"
               echo "  ruff anika_blue tests/  - Lint code"
-              echo "  nix build .#docker      - Build Docker image"
+              echo "  nix build '.#docker'    - Build Docker image"
               echo
               export DATABASE="''${DATABASE:-$PWD/anika_blue.db}"
             '';
