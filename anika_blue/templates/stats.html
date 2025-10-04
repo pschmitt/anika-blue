@@ -8,8 +8,8 @@
                 <div class="color-hex">{{ user_avg[0] }}</div>
                 <div class="color-count">Based on {{ user_avg[1] }} choice{{ 's' if user_avg[1] != 1 else '' }}</div>
             </div>
+            <button class="save-color-btn" onclick="saveBaseColor()">💾 Save</button>
         </div>
-        <button class="save-color-btn" onclick="saveBaseColor()">💾 Save My Color</button>
     </div>
     {% else %}
     <div class="stat-item">

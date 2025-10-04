@@ -215,17 +215,18 @@
         }
 
         .save-color-btn {
-            width: 100%;
-            margin-top: 10px;
-            padding: 10px;
+            width: auto;
+            margin-left: auto;
+            padding: 8px 16px;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             border: none;
             border-radius: 8px;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
+            white-space: nowrap;
         }
 
         .save-color-btn:hover {
@@ -562,17 +563,17 @@
                 e.target.classList.add('animate-success');
                 setTimeout(() => e.target.classList.remove('animate-success'), 400);
                 vote('yes');
-            });
+            }, { once: true });
             if (noBtn) noBtn.addEventListener('click', (e) => {
                 e.target.classList.add('animate-success');
                 setTimeout(() => e.target.classList.remove('animate-success'), 400);
                 vote('no');
-            });
+            }, { once: true });
             if (skipBtn) skipBtn.addEventListener('click', (e) => {
                 e.target.classList.add('animate-success');
                 setTimeout(() => e.target.classList.remove('animate-success'), 400);
                 vote('skip');
-            });
+            }, { once: true });
         }
 
         async function saveBaseColor() {
