@@ -58,7 +58,7 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            transition: background-color 0.3s ease;
+            transition: background-color 0.8s ease;
         }
 
         .hex-code {
@@ -70,6 +70,7 @@
             font-family: 'Courier New', monospace;
             box-shadow: 0 4px 12px rgba(0,0,0,0.2);
             margin-top: 20px;
+            transition: opacity 0.3s ease;
         }
 
         .controls {
@@ -377,7 +378,7 @@
             fill: white;
         }
 
-        /* Card swipe animation */
+        /* Card animations - keeping for potential future use */
         @keyframes swipeLeft {
             from {
                 transform: translateX(0) rotate(0deg);
@@ -468,24 +469,46 @@
             try {
                 const response = await fetch('/next-shade');
                 const html = await response.text();
-                const shadeContainer = document.getElementById('shade-container');
-                shadeContainer.innerHTML = html;
-                
-                // Add slide-in animation
-                shadeContainer.classList.add('slide-in-new');
-                setTimeout(() => {
-                    shadeContainer.classList.remove('slide-in-new');
-                }, 400);
                 
                 // Extract the shade from the response
                 const tempDiv = document.createElement('div');
                 tempDiv.innerHTML = html;
                 const shadeElement = tempDiv.querySelector('.shade-display');
-                if (shadeElement) {
-                    currentShade = shadeElement.style.backgroundColor;
+                const newShade = shadeElement ? shadeElement.style.backgroundColor : null;
+                const hexElement = tempDiv.querySelector('.hex-code');
+                const newHex = hexElement ? hexElement.textContent : null;
+                
+                if (!newShade || !newHex) {
+                    console.error('Could not extract shade from response');
+                    return;
                 }
                 
-                // Attach button listeners
+                // Get existing elements
+                const shadeContainer = document.getElementById('shade-container');
+                let existingShadeDisplay = shadeContainer.querySelector('.shade-display');
+                let existingHexCode = shadeContainer.querySelector('.hex-code');
+                let existingControls = shadeContainer.querySelector('.controls');
+                
+                // If elements don't exist (first load), replace entire HTML
+                if (!existingShadeDisplay || !existingHexCode) {
+                    shadeContainer.innerHTML = html;
+                    attachButtonListeners();
+                    currentShade = newShade;
+                    return;
+                }
+                
+                // Fade out hex code, update it, then fade in
+                existingHexCode.style.opacity = '0';
+                setTimeout(() => {
+                    existingHexCode.textContent = newHex;
+                    existingHexCode.style.opacity = '1';
+                }, 150);
+                
+                // Smoothly transition the background color
+                existingShadeDisplay.style.backgroundColor = newShade;
+                currentShade = newShade;
+                
+                // Reattach button listeners (in case controls were replaced)
                 attachButtonListeners();
             } catch (error) {
                 console.error('Error loading shade:', error);
@@ -507,14 +530,6 @@
             if (!hexMatch) return;
             
             const shade = hexMatch.textContent.trim();
-            const shadeContainer = document.getElementById('shade-container');
-            
-            // Add swipe animation based on choice
-            if (choice === 'yes') {
-                shadeContainer.classList.add('swipe-right');
-            } else if (choice === 'no') {
-                shadeContainer.classList.add('swipe-left');
-            }
             
             const formData = new FormData();
             formData.append('shade', shade);
@@ -531,11 +546,8 @@
                 // Update favicon after voting
                 updateFavicon();
                 
-                // Load next shade after animation completes
-                setTimeout(() => {
-                    shadeContainer.classList.remove('swipe-left', 'swipe-right');
-                    loadNextShade();
-                }, 400);
+                // Load next shade with smooth transition (no delay needed)
+                loadNextShade();
             } catch (error) {
                 console.error('Error voting:', error);
             }
