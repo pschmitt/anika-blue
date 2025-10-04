@@ -27,7 +27,7 @@ An interactive web application to help you discover your perfect shade of blue! 
 
 3. **Python** (Development):
    ```bash
-   pip install -r requirements.txt && python app.py
+   pip install uv && uv pip install flask pillow && python app.py
    ```
 
 See [DEPLOYMENT.md](DEPLOYMENT.md) for detailed deployment instructions.
@@ -49,7 +49,12 @@ cd anika-blue
 
 2. Install dependencies:
 ```bash
-pip install -r requirements.txt
+# Using uv (recommended)
+pip install uv
+uv pip install flask pillow
+
+# Or using pip directly
+pip install flask pillow
 ```
 
 3. Run the application:
@@ -124,6 +129,53 @@ For NixOS users, add to your configuration:
     dataDir = "/var/lib/anika-blue";
   };
 }
+```
+
+## Development
+
+### Running Tests
+
+```bash
+# Using pytest
+pytest tests/ -v
+
+# Or with Nix
+nix develop
+pytest tests/ -v
+```
+
+### Linting and Formatting
+
+```bash
+# Format code with Black
+black .
+
+# Check formatting
+black --check .
+
+# Lint with Flake8
+flake8 app.py tests/
+
+# Or with Nix
+nix develop
+black .
+flake8 app.py tests/
+```
+
+### Dependencies
+
+This project uses `pyproject.toml` for dependency management. Dependencies can be installed using:
+
+```bash
+# Using uv (recommended)
+pip install uv
+uv pip install flask pillow
+
+# Development dependencies
+uv pip install pytest black flake8
+
+# Or using pip directly
+pip install flask pillow pytest black flake8
 ```
 
 ## How It Works

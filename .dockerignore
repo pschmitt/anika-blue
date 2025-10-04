@@ -32,10 +32,6 @@ env/
 .git/
 .gitignore
 
-# Documentation
-README.md
-LICENSE
-
 # Nix
 result
 result-*

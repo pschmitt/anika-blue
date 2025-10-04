@@ -8,6 +8,7 @@ env/
 .DS_Store
 *.sqlite
 *.sqlite3
+.pytest_cache/
 
 # Nix
 result
