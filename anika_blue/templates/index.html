@@ -36,7 +36,7 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 20px 16px calc(48px + env(safe-area-inset-bottom, 0px));
+            padding: 20px 16px calc(60px + env(safe-area-inset-bottom, 0px));
             gap: 24px;
         }
 
@@ -45,6 +45,7 @@
             display: flex;
             flex-direction: column;
             gap: 20px;
+            min-height: calc(100vh - env(safe-area-inset-bottom, 0px) - 32px);
         }
 
         .header {
@@ -232,12 +233,39 @@
             align-self: center;
             animation: indicator-bounce 2s infinite;
             margin-top: -10px;
-            margin-bottom: calc(env(safe-area-inset-bottom, 0px) + 2px);
+            margin-bottom: 0;
+            position: sticky;
+            bottom: calc(env(safe-area-inset-bottom, 0px) + 1px);
+            z-index: 10;
         }
 
         @media (min-width: 768px) {
             .scroll-indicator {
                 display: none;
+            }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                gap: 18px;
+                padding-bottom: calc(70px + env(safe-area-inset-bottom, 0px));
+            }
+
+            .header h1 {
+                font-size: clamp(1.9rem, 7vw, 2.2rem);
+            }
+
+            .card-container {
+                min-height: min(620px, calc(100vh - 200px));
+            }
+
+            .scroll-indicator {
+                margin-top: auto;
+                bottom: calc(env(safe-area-inset-bottom, 0px) + 9px);
+            }
+
+            #stats-container {
+                margin-top: 32px;
             }
         }
 
@@ -725,7 +753,7 @@
     <div class="container">
         <div class="header">
             <h1>💙 Anika Blue 💙</h1>
-            <p>Find your perfect shade of blue</p>
+            <p>Find your perfect shade of blue (FCK AFD)</p>
         </div>
 
         <div class="card-container" id="card-container">
@@ -759,7 +787,14 @@
                     <input type="text" id="base-color-input" class="modal-input" placeholder="#1a2b3c" maxlength="7">
                     <button id="restore-copy-btn" class="modal-copy-btn" type="button" onclick="copyRestoreColor(event)" aria-label="Copy color to clipboard">📋</button>
                 </div>
-                <div id="restore-color-preview" class="modal-color-preview" aria-hidden="true"></div>
+                <div
+                    id="restore-color-preview"
+                    class="modal-color-preview copyable"
+                    role="button"
+                    tabindex="0"
+                    aria-label="Copy this color to clipboard"
+                    title="Tap to copy"
+                ></div>
             </div>
             <div id="restore-inline-message" class="modal-message"></div>
             <div class="modal-actions">
@@ -892,7 +927,7 @@
             }
         }
 
-        async function vote(choice) {
+        async function submitVote(voteValue) {
             const hexMatch = document.querySelector('.hex-code');
             if (!hexMatch) return;
             
@@ -900,7 +935,7 @@
             
             const formData = new FormData();
             formData.append('shade', shade);
-            formData.append('choice', choice);
+            formData.append('vote', voteValue);
 
             try {
                 const response = await fetch('/vote', {
@@ -937,7 +972,7 @@
                 const target = e.currentTarget;
                 target.classList.add('animate-success');
                 setTimeout(() => target.classList.remove('animate-success'), 400);
-                vote(voteType);
+                submitVote(voteType);
             };
         }
 
@@ -1172,6 +1207,17 @@
                 };
             });
 
+            const preview = document.getElementById('restore-color-preview');
+            if (preview) {
+                preview.onclick = copyRestorePreview;
+                preview.onkeydown = (evt) => {
+                    if (evt.key === 'Enter' || evt.key === ' ' || evt.key === 'Spacebar') {
+                        evt.preventDefault();
+                        copyRestorePreview({ currentTarget: preview });
+                    }
+                };
+            }
+
             const restoreModal = document.getElementById('restore-modal');
             if (!restoreModal || !restoreModal.classList.contains('visible')) {
                 updateRestorePreview(currentUserBaseColor || currentGlobalBaseColor || '');
@@ -1326,8 +1372,44 @@
             }
 
             try {
-                await navigator.clipboard.writeText(normalized);
-                showMessage('restore-message', `Color ${normalized} copied to clipboard!`, 'success', normalized);
+                const copied = await copyTextToClipboard(normalized);
+                if (copied) {
+                    showMessage('restore-message', `Color ${normalized} copied to clipboard!`, 'success', normalized);
+                } else {
+                    showMessage('restore-message', 'Unable to copy color', 'error');
+                }
+            } catch (error) {
+                console.error('Error copying restore color:', error);
+                showMessage('restore-message', 'Unable to copy color', 'error');
+            }
+        }
+
+        async function copyRestorePreview(event) {
+            const input = document.getElementById('base-color-input');
+            if (!input) {
+                showMessage('restore-message', 'No color to copy yet', 'error');
+                return;
+            }
+
+            const normalized = normalizeHex(input.value);
+
+            if (!normalized || !HEX_COLOR_REGEX.test(normalized)) {
+                setRestoreInlineMessage('Enter a valid 6-digit hex color first', 'error');
+                showMessage('restore-message', 'Invalid color value', 'error');
+                if (input) {
+                    input.focus();
+                    input.select();
+                }
+                return;
+            }
+
+            try {
+                const copied = await copyTextToClipboard(normalized);
+                if (copied) {
+                    showMessage('restore-message', `Color ${normalized} copied to clipboard!`, 'success', normalized);
+                } else {
+                    showMessage('restore-message', 'Unable to copy color', 'error');
+                }
             } catch (error) {
                 console.error('Error copying restore color:', error);
                 showMessage('restore-message', 'Unable to copy color', 'error');

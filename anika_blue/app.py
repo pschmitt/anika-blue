@@ -81,9 +81,23 @@ def init_db():
     conn = sqlite3.connect(DATABASE)
     c = conn.cursor()
 
-    # Table for user choices
+    # Table for user votes (with migration support for legacy "choices" table)
     c.execute(
-        """CREATE TABLE IF NOT EXISTS choices
+        "SELECT name FROM sqlite_master WHERE type='table' AND name='votes'"
+    )
+    has_votes_table = c.fetchone() is not None
+
+    if not has_votes_table:
+        c.execute(
+            "SELECT name FROM sqlite_master WHERE type='table' AND name='choices'"
+        )
+        legacy_choices_table = c.fetchone() is not None
+
+        if legacy_choices_table:
+            c.execute("ALTER TABLE choices RENAME TO votes")
+
+    c.execute(
+        """CREATE TABLE IF NOT EXISTS votes
                  (id INTEGER PRIMARY KEY AUTOINCREMENT,
                   user_id TEXT NOT NULL,
                   hex_color TEXT NOT NULL,
@@ -138,12 +152,12 @@ def generate_blue_shade():
 
 
 def get_user_average(user_id):
-    """Calculate the average color for a user's Anika Blue choices"""
+    """Calculate the average color for a user's Anika Blue votes"""
     conn = get_db()
     c = conn.cursor()
 
     c.execute(
-        """SELECT hex_color FROM choices
+        """SELECT hex_color FROM votes
                  WHERE user_id = ? AND is_anika_blue = 1""",
         (user_id,),
     )
@@ -173,12 +187,12 @@ def get_user_average(user_id):
 
 
 def get_global_average():
-    """Calculate the global average of all Anika Blue choices"""
+    """Calculate the global average of all Anika Blue votes"""
     conn = get_db()
     c = conn.cursor()
 
     c.execute(
-        """SELECT hex_color FROM choices
+        """SELECT hex_color FROM votes
                  WHERE is_anika_blue = 1"""
     )
 
@@ -292,15 +306,17 @@ def next_shade():
 def vote():
     """Record a user's vote for a shade"""
     shade = request.form.get("shade")
-    choice = request.form.get("choice")  # 'yes', 'no', or 'skip'
+    vote_value = request.form.get("vote")  # 'yes', 'no', or 'skip'
+    if vote_value is None:
+        vote_value = request.form.get("choice")  # Backward compatibility
 
-    if choice != "skip":
-        is_anika_blue = 1 if choice == "yes" else 0
+    if vote_value != "skip":
+        is_anika_blue = 1 if vote_value == "yes" else 0
 
         conn = get_db()
         c = conn.cursor()
         c.execute(
-            "INSERT INTO choices (user_id, hex_color, is_anika_blue) VALUES (?, ?, ?)",
+            "INSERT INTO votes (user_id, hex_color, is_anika_blue) VALUES (?, ?, ?)",
             (session["user_id"], shade, is_anika_blue),
         )
         conn.commit()

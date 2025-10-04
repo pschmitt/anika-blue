@@ -80,7 +80,7 @@ class TestDatabase:
         # Check if tables exist
         cursor.execute(
             """SELECT name FROM sqlite_master
-               WHERE type='table' AND name='choices'"""
+               WHERE type='table' AND name='votes'"""
         )
         assert cursor.fetchone() is not None
 
@@ -124,28 +124,28 @@ class TestColorGeneration:
 class TestColorAveraging:
     """Tests for color averaging functions."""
 
-    def test_get_user_average_no_choices(self, db_connection):
-        """Test that user average returns None when no choices exist."""
+    def test_get_user_average_no_votes(self, db_connection):
+        """Test that user average returns None when no votes exist."""
         app_module = get_app_module()
 
         app_module.DATABASE = db_connection
         result = get_user_average("test_user")
         assert result is None
 
-    def test_get_user_average_with_choices(self, db_connection):
+    def test_get_user_average_with_votes(self, db_connection):
         """Test that user average is calculated correctly."""
         app_module = get_app_module()
 
         conn = sqlite3.connect(db_connection)
         cursor = conn.cursor()
 
-        # Add some test choices
+        # Add some test votes
         cursor.execute(
-            "INSERT INTO choices (user_id, hex_color, is_anika_blue) VALUES (?, ?, ?)",
+            "INSERT INTO votes (user_id, hex_color, is_anika_blue) VALUES (?, ?, ?)",
             ("test_user", "#0000ff", 1),
         )
         cursor.execute(
-            "INSERT INTO choices (user_id, hex_color, is_anika_blue) VALUES (?, ?, ?)",
+            "INSERT INTO votes (user_id, hex_color, is_anika_blue) VALUES (?, ?, ?)",
             ("test_user", "#000099", 1),
         )
         conn.commit()
@@ -161,28 +161,28 @@ class TestColorAveraging:
         assert color.startswith("#")
         assert len(color) == 7
 
-    def test_get_global_average_no_choices(self, db_connection):
-        """Test that global average returns None when no choices exist."""
+    def test_get_global_average_no_votes(self, db_connection):
+        """Test that global average returns None when no votes exist."""
         app_module = get_app_module()
 
         app_module.DATABASE = db_connection
         result = get_global_average()
         assert result is None
 
-    def test_get_global_average_with_choices(self, db_connection):
+    def test_get_global_average_with_votes(self, db_connection):
         """Test that global average is calculated correctly."""
         app_module = get_app_module()
 
         conn = sqlite3.connect(db_connection)
         cursor = conn.cursor()
 
-        # Add some test choices from different users
+        # Add some test votes from different users
         cursor.execute(
-            "INSERT INTO choices (user_id, hex_color, is_anika_blue) VALUES (?, ?, ?)",
+            "INSERT INTO votes (user_id, hex_color, is_anika_blue) VALUES (?, ?, ?)",
             ("user1", "#0000ff", 1),
         )
         cursor.execute(
-            "INSERT INTO choices (user_id, hex_color, is_anika_blue) VALUES (?, ?, ?)",
+            "INSERT INTO votes (user_id, hex_color, is_anika_blue) VALUES (?, ?, ?)",
             ("user2", "#000099", 1),
         )
         conn.commit()
@@ -264,12 +264,12 @@ class TestRoutes:
         response = client.get("/next-shade")
 
         # Vote yes on it
-        response = client.post("/vote", data={"shade": "#0000ff", "choice": "yes"})
+        response = client.post("/vote", data={"shade": "#0000ff", "vote": "yes"})
         assert response.status_code == 200
 
     def test_vote_skip(self, client):
-        """Test that skip choice doesn't save to database."""
-        response = client.post("/vote", data={"shade": "#0000ff", "choice": "skip"})
+        """Test that skip vote doesn't save to database."""
+        response = client.post("/vote", data={"shade": "#0000ff", "vote": "skip"})
         assert response.status_code == 200
 
     def test_vote_count_accuracy(self, client, db_connection):
@@ -282,14 +282,14 @@ class TestRoutes:
             sess["user_id"] = "test_user"
 
         # Vote on three different shades
-        client.post("/vote", data={"shade": "#0000ff", "choice": "yes"})
-        client.post("/vote", data={"shade": "#00ff00", "choice": "yes"})
-        client.post("/vote", data={"shade": "#ff0000", "choice": "no"})
+        client.post("/vote", data={"shade": "#0000ff", "vote": "yes"})
+        client.post("/vote", data={"shade": "#00ff00", "vote": "yes"})
+        client.post("/vote", data={"shade": "#ff0000", "vote": "no"})
 
         # Count votes in database
         conn = sqlite3.connect(db_connection)
         c = conn.cursor()
-        c.execute("SELECT COUNT(*) FROM choices")
+        c.execute("SELECT COUNT(*) FROM votes")
         count = c.fetchone()[0]
         conn.close()
 
@@ -313,7 +313,7 @@ class TestRoutes:
             sess["user_id"] = "test_user"
 
         # Add a vote
-        client.post("/vote", data={"shade": "#0000ff", "choice": "yes"})
+        client.post("/vote", data={"shade": "#0000ff", "vote": "yes"})
 
         # Save base color
         response = client.post("/save-base-color")
