@@ -4,17 +4,21 @@ version = "0.1.0"
 description = "Interactive web application to discover your perfect shade of blue"
 readme = "README.md"
 requires-python = ">=3.12"
-dependencies = [
-    "flask>=3.1.2",
-    "pillow>=11.0.0",
-]
+dependencies = ["flask>=3.1.2", "pillow>=11.3.0"]
 
 [project.optional-dependencies]
-dev = [
-    "pytest>=8.3.0",
-    "black>=24.0.0",
-    "flake8>=7.0.0",
-]
+dev = ["pytest>=8.3.0", "black>=24.0.0", "flake8>=7.0.0"]
+
+[project.scripts]
+anika-blue = "anika_blue.__main__:main"
+
+[build-system]
+requires = ["uv_build>=0.8.14,<0.9.0"]
+build-backend = "uv_build"
+
+[tool.uv.build-backend]
+module-name = "anika_blue"
+module-root = ""
 
 [tool.black]
 line-length = 88

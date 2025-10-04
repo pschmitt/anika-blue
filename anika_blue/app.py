@@ -1,19 +1,27 @@
-import random
-import sqlite3
-from flask import Flask, render_template, request, session, jsonify, send_file
-from functools import wraps
-import secrets
 import os
+import random
+import secrets
+import sqlite3
+from functools import wraps
 from io import BytesIO
+from pathlib import Path
+
+from flask import Flask, jsonify, render_template, request, send_file, session
 from PIL import Image
 
-app = Flask(__name__)
-app.secret_key = os.environ.get("SECRET_KEY", secrets.token_hex(32))
-
-DEBUG = os.environ.get("DEBUG") is not None
-DATABASE = os.environ.get("DATABASE", "anika_blue.db")
+BASE_DIR = Path(__file__).resolve().parent
 BIND_HOST = os.environ.get("BIND_HOST", "0.0.0.0")
 BIND_PORT = int(os.environ.get("BIND_PORT", 5000))
+DATABASE = os.environ.get("DATABASE", "anika_blue.db")
+DEBUG = os.environ.get("DEBUG") is not None
+SECRET_KEY = os.environ.get("SECRET_KEY", secrets.token_hex(32))
+
+app = Flask(
+    __name__,
+    template_folder=str(BASE_DIR / "templates"),
+    static_folder=str(BASE_DIR / "static"),
+)
+app.secret_key = SECRET_KEY
 
 
 def init_db():
@@ -315,8 +323,3 @@ def favicon():
     img_io.seek(0)
 
     return send_file(img_io, mimetype="image/x-icon")
-
-
-if __name__ == "__main__":
-    init_db()
-    app.run(debug=DEBUG, host=BIND_HOST, port=BIND_PORT)

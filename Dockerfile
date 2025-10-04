@@ -4,30 +4,24 @@ FROM python:3.12-slim
 # Set working directory
 WORKDIR /app
 
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+
 # Install system dependencies including uv
+# hadolint ignore=DL3008
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends \
-    sqlite3 \
-    curl && \
-    curl -LsSf https://astral.sh/uv/install.sh | sh && \
+    apt-get install -y --no-install-recommends sqlite3 && \
+    mkdir -p /app /data && \
     rm -rf /var/lib/apt/lists/*
 
-# Copy pyproject.toml
-COPY pyproject.toml .
+# Copy project files
+COPY . /app
 
-# Install Python dependencies using uv
-RUN /root/.cargo/bin/uv pip install --system flask pillow
-
-# Copy application files
-COPY app.py .
-COPY templates/ templates/
-
-# Create directory for database
-RUN mkdir -p /data
+RUN pip install --no-cache-dir /app
 
 # Set environment variables
-ENV FLASK_APP=app.py
 ENV DATABASE=/data/anika_blue.db
+ENV BIND_HOST=0.0.0.0
+ENV BIND_PORT=5000
 ENV PYTHONUNBUFFERED=1
 
 # Expose port
@@ -38,4 +32,4 @@ HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
     CMD python -c "import urllib.request; urllib.request.urlopen('http://localhost:5000/').read()" || exit 1
 
 # Run the application
-CMD ["python", "app.py"]
+CMD ["anika-blue"]

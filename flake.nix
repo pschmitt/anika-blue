@@ -78,7 +78,6 @@
                 environment = {
                   DEBUG = if cfg.debug then "1" else "";
                   DATABASE = "${cfg.dataDir}/anika_blue.db";
-                  FLASK_APP = "${pkg}/share/anika-blue/app.py";
                   BIND_HOST = "${cfg.bindHost}";
                   BIND_PORT = "${toString cfg.port}";
                 }
@@ -117,36 +116,30 @@
           ...
         }:
         let
-          pythonEnv = pkgs.python312.withPackages (ps: with ps; [
-            flask
-            pillow
-          ]);
+          pythonEnv = pkgs.python313.withPackages (
+            ps: with ps; [
+              flask
+              pillow
+            ]
+          );
 
-          anika-blue = pkgs.stdenv.mkDerivation {
+          anika-blue = pkgs.python3Packages.buildPythonPackage {
             pname = "anika-blue";
             version = "0.1.0";
+            pyproject = true;
             src = ./.;
 
-            buildInputs = [ pythonEnv ];
+            nativeBuildInputs = [
+              pkgs.python3Packages.uv-build
+            ];
 
-            installPhase = ''
-              mkdir -p $out/bin
-              mkdir -p $out/share/anika-blue
+            propagatedBuildInputs = with pkgs.python3Packages; [
+              flask
+              pillow
+            ];
 
-              cp app.py $out/share/anika-blue/
-              cp -r templates $out/share/anika-blue/
-
-              cat > $out/bin/anika-blue <<EOF
-              #!/usr/bin/env bash
-              export DATABASE="\''${DATABASE:-\$HOME/.local/share/anika-blue/anika_blue.db}"
-              mkdir -p "\$(dirname "\$DATABASE")"
-              export FLASK_APP="$out/share/anika-blue/app.py"
-              cd "$out/share/anika-blue"
-              exec "${pythonEnv}/bin/python" app.py "\$@"
-              EOF
-
-              chmod +x $out/bin/anika-blue
-            '';
+            # Sanity check import at build time
+            pythonImportsCheck = [ "anika_blue" ];
 
             meta = with pkgs.lib; {
               description = "Interactive web application to discover your perfect shade of blue";
@@ -154,6 +147,7 @@
               license = licenses.gpl3Only;
               maintainers = [ ];
               platforms = platforms.all;
+              mainProgram = "anika-blue";
             };
           };
 
@@ -170,13 +164,13 @@
 
             config = {
               Cmd = [
-                "${pythonEnv}/bin/python"
-                "/app/app.py"
+                # "${pythonEnv}/bin/python"
+                # "-m"
+                "anika_blue"
               ];
               WorkingDir = "/app";
               ExposedPorts."5000/tcp" = { };
               Env = [
-                "FLASK_APP=/app/app.py"
                 "DATABASE=/data/anika_blue.db"
                 "PYTHONUNBUFFERED=1"
               ];
@@ -184,7 +178,7 @@
 
             extraCommands = ''
               mkdir -p app data
-              cp ${./app.py} app/app.py
+              cp ${./anika_blue} app/anika_blue
               cp -r ${./templates} app/templates
             '';
           };
@@ -204,29 +198,28 @@
           devShells.default = pkgs.mkShell {
             buildInputs = with pkgs; [
               pythonEnv
-              python312Packages.pip
-              python312Packages.setuptools
+              python313Packages.black
+              python313Packages.pip
+              python313Packages.pytest
+              python313Packages.setuptools
+              ruff
               sqlite
-              python312Packages.black
-              python312Packages.flake8
-              python312Packages.pytest
             ];
 
             shellHook = ''
               echo "🔵 Anika Blue Development Environment"
               echo "======================================"
               echo "Python: $(python --version)"
-              echo "Flask: $(python -c 'import flask; print(flask.__version__)')"
+              echo "Flask: $(python -c 'import importlib.metadata; print(importlib.metadata.version("flask"))')"
               echo
               echo "Commands:"
-              echo "  python app.py          - Start development server"
-              echo "  pytest tests/ -v       - Run tests"
-              echo "  black .                - Format code"
-              echo "  flake8 app.py tests/   - Lint code"
-              echo "  nix build .#docker     - Build Docker image"
+              echo "  python -m anika_blue    - Start development server"
+              echo "  pytest tests/ -v        - Run tests"
+              echo "  black .                 - Format code"
+              echo "  ruff anika_blue tests/  - Lint code"
+              echo "  nix build .#docker      - Build Docker image"
               echo
               export DATABASE="''${DATABASE:-$PWD/anika_blue.db}"
-              export FLASK_APP="$PWD/app.py"
             '';
           };
         };
