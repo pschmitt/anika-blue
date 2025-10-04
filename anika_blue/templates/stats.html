@@ -5,10 +5,13 @@
         <div class="stat-color">
             <div class="color-swatch" style="background-color: {{ user_avg[0] }};"></div>
             <div class="color-info">
-                <div class="color-hex">{{ user_avg[0] }}</div>
+                <div class="color-hex" data-color-role="user">{{ user_avg[0] }}</div>
                 <div class="color-count">Based on {{ user_avg[1] }} choice{{ 's' if user_avg[1] != 1 else '' }}</div>
             </div>
-            <button class="save-color-btn" onclick="saveBaseColor()">💾 Save</button>
+            <div class="color-actions">
+                <button class="save-color-btn" onclick="saveBaseColor(event)">📋 Copy</button>
+                <button class="restore-color-btn" onclick="openRestoreModal(event)">🔄 Restore</button>
+            </div>
         </div>
     </div>
     {% else %}
@@ -16,6 +19,9 @@
         <div class="stat-label">Your Anika Blue</div>
         <div style="text-align: center; color: #999; padding: 20px;">
             Make your first choice to see your Anika Blue!
+        </div>
+        <div class="color-actions centered">
+            <button class="restore-color-btn" onclick="openRestoreModal(event)">🔄 Restore</button>
         </div>
     </div>
     {% endif %}
@@ -26,7 +32,7 @@
         <div class="stat-color">
             <div class="color-swatch" style="background-color: {{ global_avg[0] }};"></div>
             <div class="color-info">
-                <div class="color-hex">{{ global_avg[0] }}</div>
+                <div class="color-hex" data-color-role="global">{{ global_avg[0] }}</div>
                 <div class="color-count">Based on {{ global_avg[1] }} choice{{ 's' if global_avg[1] != 1 else '' }} from all users</div>
             </div>
         </div>

@@ -234,6 +234,9 @@ def vote():
 
     # Get updated averages
     user_avg = get_user_average(session["user_id"])
+    if user_avg:
+        set_user_base_color(session["user_id"], user_avg[0])
+
     global_avg = get_global_average()
 
     return render_template("stats.html", user_avg=user_avg, global_avg=global_avg)

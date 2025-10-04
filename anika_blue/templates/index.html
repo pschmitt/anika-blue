@@ -127,6 +127,18 @@
             }
         }
 
+        @keyframes copy-button-success {
+            0% {
+                transform: translateY(-50%) scale(1);
+            }
+            50% {
+                transform: translateY(-50%) scale(1.05);
+            }
+            100% {
+                transform: translateY(-50%) scale(1);
+            }
+        }
+
         .animate-success {
             animation: button-success 0.4s ease;
         }
@@ -214,11 +226,22 @@
             opacity: 1;
         }
 
-        .save-color-btn {
-            width: auto;
+        .color-actions {
+            display: flex;
+            gap: 10px;
             margin-left: auto;
+        }
+
+        .color-actions.centered {
+            margin-left: 0;
+            justify-content: center;
+            margin-top: 15px;
+        }
+
+        .save-color-btn,
+        .restore-color-btn {
+            width: auto;
             padding: 8px 16px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             border: none;
             border-radius: 8px;
@@ -229,47 +252,178 @@
             white-space: nowrap;
         }
 
-        .save-color-btn:hover {
+        .save-color-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .restore-color-btn {
+            background: linear-gradient(135deg, #43cea2 0%, #185a9d 100%);
+        }
+
+        .save-color-btn:hover,
+        .restore-color-btn:hover {
             transform: translateY(-2px);
             box-shadow: 0 4px 12px rgba(0,0,0,0.3);
         }
 
-        .load-color-section {
-            margin-top: 20px;
-            background: rgba(255,255,255,0.95);
-            border-radius: 15px;
-            padding: 20px;
+        .modal {
+            position: fixed;
+            inset: 0;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1100;
         }
 
-        .load-color-title {
-            font-size: 0.9rem;
-            color: #666;
-            margin-bottom: 12px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
+        .modal.visible {
+            display: flex;
         }
 
-        .load-color-input {
+        .modal-backdrop {
+            position: absolute;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(2px);
+        }
+
+        .modal-content {
+            position: relative;
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            width: min(90vw, 360px);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            z-index: 1;
+        }
+
+        .modal-content h2 {
+            font-size: 1.4rem;
+            color: #334;
+            text-align: center;
+        }
+
+        .modal-input-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .modal-input-wrapper {
+            position: relative;
+            flex: 1;
+        }
+
+        .modal-input {
             width: 100%;
-            padding: 12px;
+            padding: 12px 44px 12px 12px;
             border: 2px solid #e0e0e0;
             border-radius: 8px;
             font-size: 1rem;
             font-family: 'Courier New', monospace;
-            margin-bottom: 10px;
             transition: border-color 0.3s ease;
+            text-align: center;
         }
 
-        .load-color-input:focus {
+        .modal-input:focus {
             outline: none;
             border-color: #667eea;
         }
 
-        .load-color-btn {
-            width: 100%;
+        .modal-input.invalid {
+            border-color: #dc3545;
+        }
+
+        .modal-input.invalid:focus {
+            border-color: #c82333;
+        }
+
+        .modal-copy-btn {
+            position: absolute;
+            top: 50%;
+            right: 8px;
+            transform: translateY(-50%);
+            border: none;
+            background: transparent;
+            font-size: 1.1rem;
+            cursor: pointer;
+            color: #667eea;
+            padding: 4px;
+            border-radius: 6px;
+            transition: background 0.2s ease, color 0.2s ease;
+        }
+
+        .modal-copy-btn:hover:enabled {
+            background: rgba(102, 126, 234, 0.12);
+            color: #4c51bf;
+            transform: translateY(-50%);
+        }
+
+        .modal-copy-btn:disabled {
+            cursor: not-allowed;
+            color: #bbb;
+            transform: translateY(-50%);
+        }
+
+        .modal-copy-btn:focus {
+            outline: none;
+            transform: translateY(-50%);
+        }
+
+        .modal-copy-btn.copy-animate-success {
+            animation: copy-button-success 0.4s ease;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .modal-color-preview {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            border: 2px solid #e0e0e0;
+            background: linear-gradient(45deg, #f5f5f5 25%, transparent 25%, transparent 50%, #f5f5f5 50%, #f5f5f5 75%, transparent 75%, transparent 100%);
+            transition: background 0.3s ease, border-color 0.3s ease;
+        }
+
+        .modal-message {
+            min-height: 18px;
+            text-align: center;
+            font-size: 0.85rem;
+        }
+
+        .modal-message.error {
+            color: #dc3545;
+        }
+
+        .modal-message.success {
+            color: #28a745;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background: none;
+            border: none;
+            font-size: 1.4rem;
+            cursor: pointer;
+            color: #999;
+            padding: 4px;
+        }
+
+        .modal-close:hover {
+            color: #333;
+        }
+
+        .modal-primary-btn {
+            flex: 1;
             padding: 12px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #43cea2 0%, #185a9d 100%);
             color: white;
             border: none;
             border-radius: 8px;
@@ -279,27 +433,9 @@
             transition: all 0.3s ease;
         }
 
-        .load-color-btn:hover {
+        .modal-primary-btn:hover {
             transform: translateY(-2px);
             box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-        }
-
-        .message {
-            margin-top: 10px;
-            padding: 10px;
-            border-radius: 8px;
-            font-size: 0.9rem;
-            text-align: center;
-        }
-
-        .message.success {
-            background: #d4edda;
-            color: #155724;
-        }
-
-        .message.error {
-            background: #f8d7da;
-            color: #721c24;
         }
 
         /* Toast notification styles */
@@ -312,7 +448,7 @@
             font-size: 0.95rem;
             font-weight: 500;
             box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-            z-index: 1000;
+            z-index: 2000;
             animation: slideIn 0.3s ease, slideOut 0.3s ease 4.7s;
             max-width: 350px;
         }
@@ -327,6 +463,20 @@
             background: #f8d7da;
             color: #721c24;
             border-left: 4px solid #dc3545;
+        }
+
+        .toast-color-chip {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 52px;
+            padding: 2px 8px;
+            margin: 0 6px;
+            border-radius: 999px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+            border: 1px solid rgba(0,0,0,0.08);
         }
 
         @keyframes slideIn {
@@ -446,13 +596,6 @@
         <div id="stats-container">
         </div>
 
-        <div class="load-color-section">
-            <div class="load-color-title">Restore Your Session</div>
-            <input type="text" id="base-color-input" class="load-color-input" placeholder="#1a2b3c" maxlength="7">
-            <button class="load-color-btn" onclick="loadBaseColor()">🔄 Load My Color</button>
-            <div id="load-message"></div>
-        </div>
-
         <div class="footer">
             <a href="https://github.com/pschmitt/anika-blue" target="_blank" rel="noopener noreferrer">
                 <svg class="github-logo" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -463,8 +606,30 @@
         </div>
     </div>
 
+    <div id="restore-modal" class="modal">
+        <div class="modal-backdrop" onclick="closeRestoreModal()"></div>
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeRestoreModal()" aria-label="Close restore dialog">×</button>
+            <h2>Restore Your Session</h2>
+            <div class="modal-input-row">
+                <div class="modal-input-wrapper">
+                    <input type="text" id="base-color-input" class="modal-input" placeholder="#1a2b3c" maxlength="7">
+                    <button id="restore-copy-btn" class="modal-copy-btn" type="button" onclick="copyRestoreColor(event)" aria-label="Copy color to clipboard">📋</button>
+                </div>
+                <div id="restore-color-preview" class="modal-color-preview" aria-hidden="true"></div>
+            </div>
+            <div id="restore-inline-message" class="modal-message"></div>
+            <div class="modal-actions">
+                <button class="modal-primary-btn" onclick="loadBaseColor(event)">🔄 Restore</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         let currentShade = null;
+        let currentUserBaseColor = null;
+        let currentGlobalBaseColor = null;
+        const HEX_COLOR_REGEX = /^#[0-9a-f]{6}$/i;
 
         async function loadNextShade() {
             try {
@@ -521,6 +686,7 @@
                 const response = await fetch('/stats');
                 const html = await response.text();
                 document.getElementById('stats-container').innerHTML = html;
+                updateStoredColorsFromStats();
             } catch (error) {
                 console.error('Error loading stats:', error);
             }
@@ -543,6 +709,7 @@
                 });
                 const html = await response.text();
                 document.getElementById('stats-container').innerHTML = html;
+                updateStoredColorsFromStats();
                 
                 // Update favicon after voting
                 updateFavicon();
@@ -555,67 +722,103 @@
         }
 
         function attachButtonListeners() {
-            const yesBtn = document.querySelector('.btn-yes');
-            const noBtn = document.querySelector('.btn-no');
-            const skipBtn = document.querySelector('.btn-skip');
-
-            if (yesBtn) yesBtn.addEventListener('click', (e) => {
-                e.target.classList.add('animate-success');
-                setTimeout(() => e.target.classList.remove('animate-success'), 400);
-                vote('yes');
-            }, { once: true });
-            if (noBtn) noBtn.addEventListener('click', (e) => {
-                e.target.classList.add('animate-success');
-                setTimeout(() => e.target.classList.remove('animate-success'), 400);
-                vote('no');
-            }, { once: true });
-            if (skipBtn) skipBtn.addEventListener('click', (e) => {
-                e.target.classList.add('animate-success');
-                setTimeout(() => e.target.classList.remove('animate-success'), 400);
-                vote('skip');
-            }, { once: true });
+            attachVoteHandler('.btn-yes', 'yes');
+            attachVoteHandler('.btn-no', 'no');
+            attachVoteHandler('.btn-skip', 'skip');
         }
 
-        async function saveBaseColor() {
-            try {
-                const saveBtn = event.target;
-                saveBtn.classList.add('animate-success');
-                setTimeout(() => saveBtn.classList.remove('animate-success'), 400);
-                
-                const response = await fetch('/save-base-color', {
-                    method: 'POST'
-                });
-                const data = await response.json();
-                
-                if (data.success) {
-                    // Copy to clipboard
-                    await navigator.clipboard.writeText(data.base_color);
-                    showMessage('load-message', `Color ${data.base_color} saved and copied to clipboard!`, 'success');
-                    // Update favicon after saving
-                    updateFavicon();
-                } else {
-                    showMessage('load-message', data.error || 'Failed to save color', 'error');
-                }
-            } catch (error) {
-                console.error('Error saving base color:', error);
-                showMessage('load-message', 'Error saving color', 'error');
-            }
-        }
-
-        async function loadBaseColor() {
-            const baseColor = document.getElementById('base-color-input').value.trim();
-            
-            if (!baseColor) {
-                showMessage('load-message', 'Please enter a color hex code', 'error');
+        function attachVoteHandler(selector, voteType) {
+            const button = document.querySelector(selector);
+            if (!button) {
                 return;
             }
 
-            const loadBtn = event.target;
-            loadBtn.classList.add('animate-success');
-            setTimeout(() => loadBtn.classList.remove('animate-success'), 400);
+            button.onclick = (e) => {
+                const target = e.currentTarget;
+                target.classList.add('animate-success');
+                setTimeout(() => target.classList.remove('animate-success'), 400);
+                vote(voteType);
+            };
+        }
+
+        async function saveBaseColor(event) {
+            try {
+                const saveBtn = event?.currentTarget || event?.target;
+                if (saveBtn) {
+                    saveBtn.classList.add('animate-success');
+                    setTimeout(() => saveBtn.classList.remove('animate-success'), 400);
+                }
+
+                const colorToCopy = currentUserBaseColor || currentGlobalBaseColor;
+                if (!colorToCopy) {
+                    showMessage('save-message', 'No color available yet. Make a selection first!', 'error');
+                    return;
+                }
+
+                const normalizedColor = ensureHexPrefix(colorToCopy);
+
+                await navigator.clipboard.writeText(normalizedColor);
+                showMessage('save-message', `Color ${normalizedColor} copied to clipboard!`, 'success', normalizedColor);
+            } catch (error) {
+                console.error('Error copying base color:', error);
+                showMessage('save-message', 'Unable to copy color to clipboard', 'error');
+            }
+        }
+
+        async function loadBaseColor(event) {
+            const baseInput = document.getElementById('base-color-input');
+            const baseColor = baseInput ? baseInput.value.trim() : '';
+
+            updateRestorePreview(baseColor);
+            
+            if (!baseColor) {
+                setRestoreInlineMessage('Please enter a color hex code', 'error');
+                if (baseInput) {
+                    baseInput.focus();
+                    baseInput.select();
+                }
+                return;
+            }
+
+            const loadBtn = event?.currentTarget || event?.target;
+            if (loadBtn) {
+                loadBtn.classList.add('animate-success');
+                setTimeout(() => loadBtn.classList.remove('animate-success'), 400);
+            }
+
+            const normalizedInput = normalizeHex(baseColor);
+            const isValidHex = normalizedInput && HEX_COLOR_REGEX.test(normalizedInput);
+            const normalizedUser = normalizeHex(currentUserBaseColor);
+
+            if (!isValidHex) {
+                setRestoreInlineMessage('Enter a valid 6-digit hex color', 'error');
+                showMessage('restore-message', 'Invalid color value', 'error');
+                if (baseInput) {
+                    baseInput.focus();
+                    baseInput.select();
+                }
+                return;
+            }
+
+            if (normalizedUser && normalizedInput === normalizedUser) {
+                closeRestoreModal();
+                showMessage('restore-message', 'Already using this Anika Blue. Refreshing...', 'success');
+                setTimeout(() => {
+                    loadStats();
+                    loadNextShade();
+                    updateFavicon();
+                }, 500);
+                if (baseInput) {
+                    baseInput.value = '';
+                }
+                return;
+            }
+
+            clearRestoreInlineMessage();
+            closeRestoreModal();
 
             const formData = new FormData();
-            formData.append('base_color', baseColor);
+            formData.append('base_color', normalizedInput);
 
             try {
                 const response = await fetch('/load-base-color', {
@@ -625,20 +828,188 @@
                 const data = await response.json();
                 
                 if (data.success) {
-                    showMessage('load-message', 'Session restored! Reloading...', 'success');
+                    showMessage('restore-message', 'Session restored! Reloading...', 'success');
                     // Reload stats and shade after a brief delay
                     setTimeout(() => {
                         loadStats();
                         loadNextShade();
                         updateFavicon();
-                        document.getElementById('base-color-input').value = '';
+                        if (baseInput) {
+                            baseInput.value = '';
+                        }
                     }, 1000);
                 } else {
-                    showMessage('load-message', data.error || 'Failed to load color', 'error');
+                    showMessage('restore-message', data.error || 'Failed to load color', 'error');
                 }
             } catch (error) {
                 console.error('Error loading base color:', error);
-                showMessage('load-message', 'Error loading color', 'error');
+                showMessage('restore-message', 'Error loading color', 'error');
+            }
+        }
+
+        function openRestoreModal(event) {
+            const trigger = event?.currentTarget || event?.target;
+            if (trigger) {
+                trigger.classList.add('animate-success');
+                setTimeout(() => trigger.classList.remove('animate-success'), 400);
+            }
+
+            const modal = document.getElementById('restore-modal');
+            if (!modal) return;
+            modal.classList.add('visible');
+
+            const input = document.getElementById('base-color-input');
+            clearRestoreInlineMessage();
+            if (input) {
+                const defaultValue = currentUserBaseColor || currentGlobalBaseColor || '';
+                input.value = defaultValue;
+                updateRestorePreview(defaultValue);
+                // Delay focus slightly to ensure visibility on mobile keyboards
+                setTimeout(() => {
+                    input.focus();
+                    input.select();
+                }, 50);
+            }
+        }
+
+        function closeRestoreModal() {
+            const modal = document.getElementById('restore-modal');
+            if (!modal) return;
+            modal.classList.remove('visible');
+            clearRestoreInlineMessage();
+            updateRestorePreview(currentUserBaseColor || currentGlobalBaseColor || '');
+        }
+
+        function updateStoredColorsFromStats() {
+            const container = document.getElementById('stats-container');
+            if (!container) {
+                return;
+            }
+
+            const userEl = container.querySelector('[data-color-role="user"]');
+            const globalEl = container.querySelector('[data-color-role="global"]');
+
+            currentUserBaseColor = userEl ? userEl.textContent.trim() : null;
+            currentGlobalBaseColor = globalEl ? globalEl.textContent.trim() : null;
+
+            const restoreModal = document.getElementById('restore-modal');
+            if (!restoreModal || !restoreModal.classList.contains('visible')) {
+                updateRestorePreview(currentUserBaseColor || currentGlobalBaseColor || '');
+            }
+        }
+
+        function normalizeHex(hex) {
+            if (!hex) {
+                return null;
+            }
+            let value = hex.trim().toLowerCase();
+            if (!value.startsWith('#')) {
+                value = `#${value}`;
+            }
+            return value;
+        }
+
+        function ensureHexPrefix(hex) {
+            if (!hex) {
+                return hex;
+            }
+            return hex.trim().startsWith('#') ? hex.trim() : `#${hex.trim()}`;
+        }
+
+        function getReadableTextColor(hex) {
+            if (!hex || !HEX_COLOR_REGEX.test(hex)) {
+                return '#1f2933';
+            }
+            const r = parseInt(hex.slice(1, 3), 16);
+            const g = parseInt(hex.slice(3, 5), 16);
+            const b = parseInt(hex.slice(5, 7), 16);
+            const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+            return luminance > 0.6 ? '#1f2933' : '#fdfdfd';
+        }
+
+        function updateRestorePreview(rawValue) {
+            const preview = document.getElementById('restore-color-preview');
+            const input = document.getElementById('base-color-input');
+            if (!preview) {
+                return;
+            }
+
+            const normalized = normalizeHex(rawValue);
+            const isValid = normalized && HEX_COLOR_REGEX.test(normalized);
+
+            if (input) {
+                input.classList.toggle('invalid', !isValid && rawValue.trim() !== '');
+                input.classList.toggle('valid', !!isValid);
+            }
+
+            if (isValid) {
+                preview.style.background = normalized;
+                preview.style.backgroundColor = normalized;
+                preview.style.borderColor = 'rgba(0, 0, 0, 0.1)';
+                preview.title = normalized;
+                preview.setAttribute('data-valid', 'true');
+            } else {
+                preview.style.background = '';
+                preview.style.backgroundColor = '';
+                preview.style.borderColor = rawValue.trim() ? '#f5b1b8' : '#e0e0e0';
+                preview.removeAttribute('title');
+                preview.setAttribute('data-valid', 'false');
+            }
+
+            const copyBtn = document.getElementById('restore-copy-btn');
+            if (copyBtn) {
+                copyBtn.disabled = !isValid;
+            }
+        }
+
+        function setRestoreInlineMessage(message, type) {
+            const messageEl = document.getElementById('restore-inline-message');
+            if (!messageEl) return;
+            messageEl.textContent = message;
+            messageEl.classList.remove('error', 'success');
+            if (type) {
+                messageEl.classList.add(type);
+            }
+        }
+
+        function clearRestoreInlineMessage() {
+            setRestoreInlineMessage('', null);
+        }
+
+        async function copyRestoreColor(event) {
+            const button = event?.currentTarget || event?.target;
+            const input = document.getElementById('base-color-input');
+            if (button && button.disabled) {
+                return;
+            }
+            if (button) {
+                button.classList.add('copy-animate-success');
+                setTimeout(() => button.classList.remove('copy-animate-success'), 400);
+            }
+
+            if (!input) {
+                showMessage('restore-message', 'No color to copy yet', 'error');
+                return;
+            }
+
+            const normalized = normalizeHex(input.value);
+
+            if (!normalized || !HEX_COLOR_REGEX.test(normalized)) {
+                setRestoreInlineMessage('Enter a valid 6-digit hex color first', 'error');
+                showMessage('restore-message', 'Invalid color value', 'error');
+                if (input) {
+                    input.focus();
+                    input.select();
+                }
+                return;
+            }
+
+            try {
+                await navigator.clipboard.writeText(normalized);
+                showMessage('restore-message', `Color ${normalized} copied to clipboard!`, 'success', normalized);
+            } catch (error) {
+                console.error('Error copying restore color:', error);
+                showMessage('restore-message', 'Unable to copy color', 'error');
             }
         }
 
@@ -650,11 +1021,33 @@
             }
         }
 
-        function showMessage(elementId, message, type) {
+        function showMessage(elementId, message, type, highlightHex = null) {
             // Create toast element
             const toast = document.createElement('div');
             toast.className = `toast ${type}`;
-            toast.textContent = message;
+            if (highlightHex) {
+                const normalizedHighlight = normalizeHex(highlightHex);
+                const idx = message.indexOf(normalizedHighlight);
+                if (normalizedHighlight && idx >= 0) {
+                    const before = message.slice(0, idx);
+                    const after = message.slice(idx + normalizedHighlight.length);
+
+                    toast.append(document.createTextNode(before));
+
+                    const chip = document.createElement('span');
+                    chip.className = 'toast-color-chip';
+                    chip.textContent = normalizedHighlight;
+                    chip.style.background = normalizedHighlight;
+                    chip.style.color = getReadableTextColor(normalizedHighlight);
+                    toast.append(chip);
+
+                    toast.append(document.createTextNode(after));
+                } else {
+                    toast.textContent = message;
+                }
+            } else {
+                toast.textContent = message;
+            }
             
             // Add to body
             document.body.appendChild(toast);
@@ -669,6 +1062,20 @@
         document.addEventListener('DOMContentLoaded', () => {
             loadNextShade();
             loadStats();
+
+            const baseInput = document.getElementById('base-color-input');
+            if (baseInput) {
+                baseInput.addEventListener('input', (evt) => {
+                    updateRestorePreview(evt.target.value);
+                });
+                updateRestorePreview(baseInput.value);
+            }
+
+            document.addEventListener('keydown', (evt) => {
+                if (evt.key === 'Escape') {
+                    closeRestoreModal();
+                }
+            });
         });
     </script>
 </body>
