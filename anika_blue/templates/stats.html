@@ -7,16 +7,17 @@
         <div class="stat-color">
             <div
                 class="color-swatch copyable"
-                style="background-color: {{ user_avg[0] }};"
+                style="background-color: {{ user_avg.hex }};"
                 role="button"
                 tabindex="0"
                 data-copy-role="user"
-                aria-label="Copy your Anika Blue {{ user_avg[0] }} to clipboard"
+                aria-label="Copy your Anika Blue {{ user_avg.hex }} ({{ user_avg.descriptive_name }}) to clipboard"
                 title="Tap to copy"
             ></div>
             <div class="color-info">
-                <div class="color-hex" data-color-role="user">{{ user_avg[0] }}</div>
-                <div class="color-count">Based on {{ user_avg[1] }} vote{{ 's' if user_avg[1] != 1 else '' }}</div>
+                <div class="color-hex" data-color-role="user">{{ user_avg.hex }}</div>
+                <div class="color-name">{{ user_avg.combined_name }}</div>
+                <div class="color-count">Based on {{ user_avg.count }} vote{{ 's' if user_avg.count != 1 else '' }}</div>
             </div>
         </div>
     </div>
@@ -40,16 +41,17 @@
         <div class="stat-color">
             <div
                 class="color-swatch copyable"
-                style="background-color: {{ global_avg[0] }};"
+                style="background-color: {{ global_avg.hex }};"
                 role="button"
                 tabindex="0"
                 data-copy-role="global"
-                aria-label="Copy the global Anika Blue {{ global_avg[0] }} to clipboard"
+                aria-label="Copy the global Anika Blue {{ global_avg.hex }} ({{ global_avg.descriptive_name }}) to clipboard"
                 title="Tap to copy"
             ></div>
             <div class="color-info">
-                <div class="color-hex" data-color-role="global">{{ global_avg[0] }}</div>
-                <div class="color-count">Based on {{ global_avg[1] }} vote{{ 's' if global_avg[1] != 1 else '' }} from all users</div>
+                <div class="color-hex" data-color-role="global">{{ global_avg.hex }}</div>
+                <div class="color-name">{{ global_avg.combined_name }}</div>
+                <div class="color-count">Based on {{ global_avg.count }} vote{{ 's' if global_avg.count != 1 else '' }} from all users</div>
             </div>
         </div>
     </div>

@@ -9,6 +9,7 @@ source = { editable = "." }
 dependencies = [
     { name = "flask" },
     { name = "pillow" },
+    { name = "webcolors" },
 ]
 
 [package.optional-dependencies]
@@ -18,12 +19,6 @@ dev = [
     { name = "pytest" },
 ]
 
-[package.dev-dependencies]
-dev = [
-    { name = "pytest-emoji" },
-    { name = "pytest-markdown" },
-]
-
 [package.metadata]
 requires-dist = [
     { name = "black", marker = "extra == 'dev'", specifier = ">=24.0.0" },
@@ -31,14 +26,9 @@ requires-dist = [
     { name = "flask", specifier = ">=3.1.2" },
     { name = "pillow", specifier = ">=11.3.0" },
     { name = "pytest", marker = "extra == 'dev'", specifier = ">=8.3.0" },
+    { name = "webcolors", specifier = ">=24.6.0" },
 ]
 provides-extras = ["dev"]
-
-[package.metadata.requires-dev]
-dev = [
-    { name = "pytest-emoji", specifier = ">=0.2.0" },
-    { name = "pytest-markdown", specifier = ">=0.0.7" },
-]
 
 [[package]]
 name = "black"
@@ -96,18 +86,6 @@ wheels = [
 ]
 
 [[package]]
-name = "commonmark"
-version = "0.8.1"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "future" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/21/ba/5133e424a9112aa76cf09ce82cbc2af712691f4a80abd123b6de3aa47f07/commonmark-0.8.1.tar.gz", hash = "sha256:abcbc854e0eae5deaf52ae5e328501b78b4a0758bf98ac8bb792fce993006084", size = 90795, upload-time = "2018-09-06T17:24:44.408Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/ab/ca/439c88039583a29564a0043186875258e9a4f041fb5c422cd387b8e10175/commonmark-0.8.1-py2.py3-none-any.whl", hash = "sha256:9f6dda7876b2bb88dd784440166f4bc8e56cb2b2551264051123bacb0b6c1d8a", size = 47387, upload-time = "2018-09-06T17:24:43.005Z" },
-]
-
-[[package]]
 name = "flake8"
 version = "7.3.0"
 source = { registry = "https://pypi.org/simple" }
@@ -136,15 +114,6 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/dc/6d/cfe3c0fcc5e477df242b98bfe186a4c34357b4847e87ecaef04507332dab/flask-3.1.2.tar.gz", hash = "sha256:bf656c15c80190ed628ad08cdfd3aaa35beb087855e2f494910aa3774cc4fd87", size = 720160, upload-time = "2025-08-19T21:03:21.205Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/ec/f9/7f9263c5695f4bd0023734af91bedb2ff8209e8de6ead162f35d8dc762fd/flask-3.1.2-py3-none-any.whl", hash = "sha256:ca1d8112ec8a6158cc29ea4858963350011b5c846a414cdb7a954aa9e967d03c", size = 103308, upload-time = "2025-08-19T21:03:19.499Z" },
-]
-
-[[package]]
-name = "future"
-version = "1.0.0"
-source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/a7/b2/4140c69c6a66432916b26158687e821ba631a4c9273c474343badf84d3ba/future-1.0.0.tar.gz", hash = "sha256:bd2968309307861edae1458a4f8a4f3598c03be43b97521076aebf5d94c07b05", size = 1228490, upload-time = "2024-02-21T11:52:38.461Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/da/71/ae30dadffc90b9006d77af76b393cb9dfbfc9629f339fc1574a1c52e6806/future-1.0.0-py3-none-any.whl", hash = "sha256:929292d34f5872e70396626ef385ec22355a1fae8ad29e1a734c3e43f9fbc216", size = 491326, upload-time = "2024-02-21T11:52:35.956Z" },
 ]
 
 [[package]]
@@ -404,37 +373,21 @@ wheels = [
 ]
 
 [[package]]
-name = "pytest-emoji"
-version = "0.2.0"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "pytest" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/88/4d/d489f939f0717a034cea7955d36bc2a7a5ba1b263871e63ad8cb16d47555/pytest-emoji-0.2.0.tar.gz", hash = "sha256:e1bd4790d87649c2d09c272c88bdfc4d37c1cc7c7a46583087d7c510944571e8", size = 6171, upload-time = "2019-02-19T09:33:17.454Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/f7/51/80af966c0aded877da7577d21c4601ca98c6f603c6e6073ddea071af01ec/pytest_emoji-0.2.0-py3-none-any.whl", hash = "sha256:6e34ed21970fa4b80a56ad11417456bd873eb066c02315fe9df0fafe6d4d4436", size = 5664, upload-time = "2019-02-19T09:33:15.771Z" },
-]
-
-[[package]]
-name = "pytest-markdown"
-version = "0.0.7"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "commonmark" },
-    { name = "pytest" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/73/67/742a6e66efd46214d35bbb9a22aa4d8924a56ff8414dcd2092013f189c80/pytest_markdown-0.0.7.tar.gz", hash = "sha256:a3fd96c639ffb5d48d0c2f7821693ff0e3b4d251e1668dbd68535272e633b9b4", size = 3312, upload-time = "2019-05-26T18:09:16.836Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/a6/e0/fa01123ce25385835d53a2972f30b7c4afcb91b244bb79cadd020188b6a3/pytest_markdown-0.0.7-py3-none-any.whl", hash = "sha256:ff9b2b7371f2f767734bcca7b261485afbd59ded74cd3c6a15179faf7197ca4b", size = 5460, upload-time = "2019-05-26T18:09:15.081Z" },
-]
-
-[[package]]
 name = "pytokens"
 version = "0.1.10"
 source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/30/5f/e959a442435e24f6fb5a01aec6c657079ceaca1b3baf18561c3728d681da/pytokens-0.1.10.tar.gz", hash = "sha256:c9a4bfa0be1d26aebce03e6884ba454e842f186a59ea43a6d3b25af58223c044", size = 12171, upload-time = "2025-02-19T14:51:22.001Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/60/e5/63bed382f6a7a5ba70e7e132b8b7b8abbcf4888ffa6be4877698dcfbed7d/pytokens-0.1.10-py3-none-any.whl", hash = "sha256:db7b72284e480e69fb085d9f251f66b3d2df8b7166059261258ff35f50fb711b", size = 12046, upload-time = "2025-02-19T14:51:18.694Z" },
+]
+
+[[package]]
+name = "webcolors"
+version = "24.11.1"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/7b/29/061ec845fb58521848f3739e466efd8250b4b7b98c1b6c5bf4d40b419b7e/webcolors-24.11.1.tar.gz", hash = "sha256:ecb3d768f32202af770477b8b65f318fa4f566c22948673a977b00d589dd80f6", size = 45064, upload-time = "2024-11-11T07:43:24.224Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/60/e8/c0e05e4684d13459f93d312077a9a2efbe04d59c393bc2b8802248c908d4/webcolors-24.11.1-py3-none-any.whl", hash = "sha256:515291393b4cdf0eb19c155749a096f779f7d909f7cceea072791cb9095b92e9", size = 14934, upload-time = "2024-11-11T07:43:22.529Z" },
 ]
 
 [[package]]

@@ -1,11 +1,19 @@
-<div class="shade-display" data-shade="{{ shade }}">
-    <div
-        class="hex-code copyable"
-        role="button"
-        tabindex="0"
-        aria-label="Copy {{ shade }} to clipboard"
-        title="Tap to copy"
-    >{{ shade }}</div>
+<div
+    class="shade-display"
+    data-shade="{{ shade }}"
+    data-shade-name="{{ shade_details.descriptive_name }}"
+    data-shade-combined="{{ shade_details.combined_name }}"
+>
+    <div class="shade-info">
+        <div
+            class="hex-code copyable"
+            role="button"
+            tabindex="0"
+            aria-label="Copy {{ shade }} ({{ shade_details.combined_name }}) to clipboard"
+            title="Tap to copy"
+        >{{ shade }}</div>
+        <div class="shade-name">{{ shade_details.combined_name }}</div>
+    </div>
 </div>
 <div class="controls">
     <button class="btn-no">

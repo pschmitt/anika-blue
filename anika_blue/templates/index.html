@@ -112,6 +112,14 @@
             z-index: 1;
         }
 
+        .shade-info {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 14px;
+            margin-top: 20px;
+        }
+
         .hex-code {
             background: rgba(255,255,255,0.9);
             padding: 15px 30px;
@@ -120,8 +128,19 @@
             font-weight: bold;
             font-family: 'Courier New', monospace;
             box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-            margin-top: 20px;
+            margin-top: 0;
             transition: opacity 0.3s ease;
+        }
+
+        .shade-name {
+            background: rgba(255, 255, 255, 0.85);
+            padding: 8px 18px;
+            border-radius: 999px;
+            font-size: 1rem;
+            font-weight: 600;
+            color: #1f2933;
+            text-transform: capitalize;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.18);
         }
 
         .hex-code.copyable {
@@ -324,8 +343,7 @@
         }
 
         .restore-pill:hover,
-        .restore-pill:active,
-        .stat-empty.inline-action .restore-pill {
+        .restore-pill:active {
             box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
             transform: none;
         }
@@ -347,14 +365,12 @@
 
         .stat-empty.inline-action {
             display: flex;
-            flex-direction: column;
+            flex-direction: row;
             gap: 12px;
             align-items: center;
+            justify-content: center;
             text-align: center;
-        }
-
-        .stat-empty.inline-action button {
-            align-self: center;
+            flex-wrap: wrap;
         }
 
         .color-swatch {
@@ -399,6 +415,14 @@
             color: #1f2933;
         }
 
+        .color-name {
+            font-size: 1rem;
+            font-weight: 500;
+            color: #1f2933;
+            opacity: 0.85;
+            margin-bottom: 6px;
+        }
+
         .color-count {
             font-size: 0.9rem;
             color: #2b3148;
@@ -433,6 +457,12 @@
             .restore-pill {
                 font-size: 0.68rem;
                 padding: 4px 10px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .stat-empty.inline-action {
+                flex-direction: column;
             }
         }
 
@@ -885,8 +915,15 @@
                 tempDiv.innerHTML = html;
                 const shadeElement = tempDiv.querySelector('.shade-display');
                 const newShade = shadeElement ? shadeElement.getAttribute('data-shade') || shadeElement.dataset.shade || null : null;
+                let newShadeName = shadeElement ? shadeElement.getAttribute('data-shade-name') || shadeElement.dataset.shadeName || null : null;
+                const newShadeCombined = shadeElement ? shadeElement.getAttribute('data-shade-combined') || shadeElement.dataset.shadeCombined || null : null;
                 const hexElement = tempDiv.querySelector('.hex-code');
-                const newHex = hexElement ? hexElement.textContent : null;
+                const newHex = hexElement ? hexElement.textContent.trim() : null;
+                const nameElement = tempDiv.querySelector('.shade-name');
+                if (!newShadeName && nameElement) {
+                    newShadeName = nameElement.textContent.trim();
+                }
+                const combinedText = newShadeCombined || (nameElement ? nameElement.textContent.trim() : null);
                 
                 if (!newShade || !newHex) {
                     console.error('Could not extract shade from response');
@@ -898,22 +935,44 @@
                 let existingShadeDisplay = shadeContainer.querySelector('.shade-display');
                 let existingHexCode = shadeContainer.querySelector('.hex-code');
                 let existingControls = shadeContainer.querySelector('.controls');
+                let existingShadeName = shadeContainer.querySelector('.shade-name');
 
-                if (!existingShadeDisplay || !existingHexCode || !existingControls) {
+                if (!existingShadeDisplay || !existingHexCode || !existingControls || !existingShadeName) {
                     shadeContainer.innerHTML = html;
                     existingShadeDisplay = shadeContainer.querySelector('.shade-display');
                     existingHexCode = shadeContainer.querySelector('.hex-code');
                     existingControls = shadeContainer.querySelector('.controls');
+                    existingShadeName = shadeContainer.querySelector('.shade-name');
                 }
-                
+
                 // Fade out hex code, update it, then fade in
                 existingHexCode.style.opacity = '0';
                 setTimeout(() => {
                     existingHexCode.textContent = newHex;
+                    const labelParts = [];
+                    if (newHex) {
+                        labelParts.push(newHex);
+                    }
+                    if (combinedText) {
+                        labelParts.push(combinedText);
+                    }
+                    existingHexCode.setAttribute('aria-label', `Copy ${labelParts.join(' ')} to clipboard`);
+                    existingHexCode.setAttribute('title', 'Tap to copy');
                     existingHexCode.style.opacity = '1';
+                    if (existingShadeName) {
+                        existingShadeName.textContent = combinedText || '';
+                    }
                 }, 150);
                 if (existingShadeDisplay && newShade) {
                     existingShadeDisplay.setAttribute('data-shade', newShade);
+                    if (newShadeName) {
+                        existingShadeDisplay.setAttribute('data-shade-name', newShadeName);
+                    }
+                    if (combinedText) {
+                        existingShadeDisplay.setAttribute('data-shade-combined', combinedText);
+                    } else {
+                        existingShadeDisplay.removeAttribute('data-shade-combined');
+                    }
                 }
                 if (existingControls) {
                     existingControls.style.removeProperty('background-color');

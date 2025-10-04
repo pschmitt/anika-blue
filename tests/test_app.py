@@ -15,6 +15,7 @@ from anika_blue.app import (
     get_user_base_color,
     set_user_base_color,
     find_user_by_base_color,
+    get_color_details,
 )
 
 
@@ -123,6 +124,20 @@ class TestColorGeneration:
 
 class TestColorAveraging:
     """Tests for color averaging functions."""
+
+    def test_get_color_details_exact(self):
+        """Exact CSS color names are returned in the details payload."""
+        details = get_color_details("#0000ff")
+        assert details["css_name"] == "Blue"
+        assert "Blue" in details["display_name"]
+
+    def test_get_color_details_closest_match(self):
+        """Nearest descriptive names are returned when no exact match exists."""
+        details = get_color_details("#123456")
+        assert isinstance(details["descriptive_name"], str)
+        assert details["descriptive_name"] != "Unknown Color"
+        if details["css_name"]:
+            assert details["css_display_name"].startswith("~ ")
 
     def test_get_user_average_no_votes(self, db_connection):
         """Test that user average returns None when no votes exist."""
@@ -253,10 +268,12 @@ class TestRoutes:
         assert response.status_code == 200
 
     def test_next_shade_route(self, client):
-        """Test that next-shade route returns a shade."""
+        """Test that next-shade route returns a shade with metadata."""
         response = client.get("/next-shade")
         assert response.status_code == 200
         assert b"#" in response.data
+        assert b"shade-name" in response.data
+        assert b"data-shade-combined" in response.data
 
     def test_vote_route(self, client):
         """Test that vote route processes votes correctly."""

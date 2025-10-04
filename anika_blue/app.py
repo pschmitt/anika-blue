@@ -1,4 +1,6 @@
+import colorsys
 import hashlib
+import math
 import os
 import random
 import secrets
@@ -10,6 +12,107 @@ from pathlib import Path
 
 from flask import Flask, jsonify, render_template, request, send_file, session
 from PIL import Image
+import webcolors
+
+CSS3_NAME_LIST = webcolors.names(webcolors.CSS3)
+CSS3_HEX_TO_NAMES = {
+    webcolors.normalize_hex(webcolors.name_to_hex(name, spec=webcolors.CSS3)): name
+    for name in CSS3_NAME_LIST
+}
+
+COLOR_NAME_SUFFIXES = sorted(
+    {
+        "aquamarine",
+        "chartreuse",
+        "turquoise",
+        "goldenrod",
+        "firebrick",
+        "spring",
+        "magenta",
+        "orange",
+        "purple",
+        "yellow",
+        "violet",
+        "indigo",
+        "silver",
+        "brown",
+        "black",
+        "white",
+        "green",
+        "blue",
+        "gray",
+        "grey",
+        "red",
+        "pink",
+        "cyan",
+        "gold",
+        "aqua",
+        "beige",
+        "coral",
+        "olive",
+        "ivory",
+        "tan",
+        "khaki",
+        "teal",
+        "navy",
+        "plum",
+        "rose",
+        "peru",
+        "sienna",
+        "wheat",
+        "steel",
+        "slate",
+        "sky",
+        "sea",
+        "mint",
+        "lavender",
+        "honeydew",
+        "lemon",
+        "powder",
+        "sandy",
+        "peach",
+        "papaya",
+        "moccasin",
+        "linen",
+        "snow",
+        "seashell",
+        "orchid",
+        "salmon",
+        "tomato",
+        "chocolate",
+        "almond",
+        "chiffon",
+        "cream",
+        "smoke",
+        "ghost",
+        "gainsboro",
+        "antique",
+        "rebecca",
+        "dodger",
+        "royal",
+        "medium",
+        "light",
+        "dark",
+        "deep",
+        "pale",
+        "hot",
+        "old",
+        "forest",
+        "floral",
+        "cadet",
+        "lime",
+        "fuchsia",
+        "azure",
+        "bisque",
+        "thistle",
+        "burly",
+        "wood",
+        "rosy",
+        "lawn",
+    },
+    key=len,
+    reverse=True,
+)
 
 BASE_DIR = Path(__file__).resolve().parent
 BIND_HOST = os.environ.get("BIND_HOST", "0.0.0.0")
@@ -149,6 +252,198 @@ def generate_blue_shade():
     g = random.randint(0, 200)
     b = random.randint(150, 255)
     return f"#{r:02x}{g:02x}{b:02x}"
+
+
+def normalize_hex_color(hex_color: str | None) -> str | None:
+    if not hex_color:
+        return None
+    value = hex_color.strip()
+    if not value:
+        return None
+    if not value.startswith("#"):
+        value = f"#{value}"
+    value = value[:7]
+    return value.lower()
+
+
+def format_color_name(raw_name: str | None) -> str:
+    if not raw_name:
+        return "Unknown Color"
+    name = raw_name.replace("-", " ").replace("_", " ").strip()
+    if " " in name:
+        return " ".join(word.capitalize() for word in name.split())
+
+    for suffix in COLOR_NAME_SUFFIXES:
+        if name.endswith(suffix) and name != suffix:
+            prefix = name[: -len(suffix)]
+            prefix_formatted = format_color_name(prefix)
+            if prefix_formatted == "Unknown Color":
+                prefix_formatted = prefix.capitalize() if prefix else ""
+            suffix_formatted = suffix.capitalize()
+            return (prefix_formatted + " " + suffix_formatted).strip()
+
+    return name.capitalize()
+
+
+def get_nearest_css3(hex_color: str | None):
+    normalized = normalize_hex_color(hex_color)
+    if not normalized:
+        return None, None, None, False
+
+    try:
+        target_rgb = webcolors.hex_to_rgb(normalized)
+    except ValueError:
+        return None, None, None, False
+
+    best_name = None
+    best_hex = None
+    best_distance = None
+
+    for css_hex, css_name in CSS3_HEX_TO_NAMES.items():
+        css_rgb = webcolors.hex_to_rgb(css_hex)
+        distance = (
+            (css_rgb.red - target_rgb.red) ** 2
+            + (css_rgb.green - target_rgb.green) ** 2
+            + (css_rgb.blue - target_rgb.blue) ** 2
+        )
+
+        if best_distance is None or distance < best_distance:
+            best_distance = distance
+            best_name = css_name
+            best_hex = css_hex
+
+    if best_name is None:
+        return None, None, None, False
+
+    normalized_best_hex = webcolors.normalize_hex(best_hex)
+    is_exact = normalized_best_hex == normalized
+
+    return (
+        format_color_name(best_name),
+        normalized_best_hex,
+        math.sqrt(best_distance) if best_distance is not None else None,
+        is_exact,
+    )
+
+
+def describe_color(hex_color: str | None) -> str:
+    normalized = normalize_hex_color(hex_color)
+    if not normalized:
+        return "Unknown Color"
+
+    try:
+        r = int(normalized[1:3], 16) / 255
+        g = int(normalized[3:5], 16) / 255
+        b = int(normalized[5:7], 16) / 255
+    except ValueError:
+        return "Unknown Color"
+
+    h, l, s = colorsys.rgb_to_hls(r, g, b)
+    h_deg = (h * 360.0) % 360.0
+
+    if s < 0.12:
+        if l < 0.08:
+            return "Near Black"
+        if l < 0.22:
+            return "Very Dark Gray"
+        if l < 0.38:
+            return "Dark Gray"
+        if l < 0.65:
+            return "Neutral Gray"
+        if l < 0.85:
+            return "Light Gray"
+        return "Near White"
+
+    hue_categories = [
+        (345, 360, "Red"),
+        (0, 15, "Red"),
+        (15, 45, "Orange"),
+        (45, 70, "Golden Yellow"),
+        (70, 100, "Lime"),
+        (100, 135, "Green"),
+        (135, 165, "Spring Green"),
+        (165, 190, "Teal"),
+        (190, 215, "Cyan"),
+        (215, 245, "Azure"),
+        (245, 275, "Blue"),
+        (275, 305, "Indigo"),
+        (305, 330, "Violet"),
+        (330, 345, "Magenta"),
+    ]
+
+    hue_name = "Color"
+    for start, end, name in hue_categories:
+        if start <= end:
+            if start <= h_deg < end:
+                hue_name = name
+                break
+        else:  # wraparound segment
+            if h_deg >= start or h_deg < end:
+                hue_name = name
+                break
+
+    if s < 0.28:
+        saturation_adj = "Soft"
+    elif s < 0.55:
+        saturation_adj = ""
+    elif s < 0.78:
+        saturation_adj = "Vivid"
+    else:
+        saturation_adj = "Brilliant"
+
+    if l < 0.2:
+        lightness_adj = "Deep"
+    elif l < 0.35:
+        lightness_adj = "Dark"
+    elif l < 0.5:
+        lightness_adj = ""
+    elif l < 0.7:
+        lightness_adj = "Light"
+    else:
+        lightness_adj = "Pale"
+
+    parts = [part for part in (saturation_adj, lightness_adj, hue_name) if part]
+    return " ".join(parts) if parts else hue_name
+
+
+def get_color_details(hex_color: str | None) -> dict:
+    normalized = normalize_hex_color(hex_color)
+    css_name, css_hex, css_distance, css_exact = get_nearest_css3(normalized)
+    descriptive_name = describe_color(normalized)
+
+    css_display_name = None
+    if css_name:
+        prefix = "" if css_exact else "~ "
+        css_display_name = f"{prefix}{css_name}"
+
+    if css_display_name:
+        combined_name = f"{descriptive_name} / {css_display_name}"
+    else:
+        combined_name = descriptive_name
+
+    return {
+        "descriptive_name": descriptive_name,
+        "css_name": css_name,
+        "css_hex": css_hex,
+        "css_distance": round(css_distance, 2) if css_distance is not None else None,
+        "css_exact": css_exact,
+        "css_display_name": css_display_name,
+        "display_name": combined_name,
+        "combined_name": combined_name,
+    }
+
+
+def build_color_context(color_info):
+    if not color_info:
+        return None
+    hex_color, count = color_info
+    normalized_hex = normalize_hex_color(hex_color)
+    details = get_color_details(normalized_hex or hex_color)
+    return {
+        "hex": normalized_hex or hex_color,
+        "count": count,
+        **details,
+    }
 
 
 def get_user_average(user_id):
@@ -298,7 +593,11 @@ def next_shade():
     conn.commit()
     conn.close()
 
-    return render_template("shade_card.html", shade=shade)
+    return render_template(
+        "shade_card.html",
+        shade=shade,
+        shade_details=get_color_details(shade),
+    )
 
 
 @app.route("/vote", methods=["POST"])
@@ -323,11 +622,12 @@ def vote():
         conn.close()
 
     # Get updated averages
-    user_avg = get_user_average(session["user_id"])
-    if user_avg:
-        set_user_base_color(session["user_id"], user_avg[0])
+    user_avg_tuple = get_user_average(session["user_id"])
+    if user_avg_tuple:
+        set_user_base_color(session["user_id"], user_avg_tuple[0])
 
-    global_avg = get_global_average()
+    user_avg = build_color_context(user_avg_tuple)
+    global_avg = build_color_context(get_global_average())
 
     return render_template("stats.html", user_avg=user_avg, global_avg=global_avg)
 
@@ -336,8 +636,8 @@ def vote():
 @ensure_user_id
 def stats():
     """Get current statistics"""
-    user_avg = get_user_average(session["user_id"])
-    global_avg = get_global_average()
+    user_avg = build_color_context(get_user_average(session["user_id"]))
+    global_avg = build_color_context(get_global_average())
 
     return render_template("stats.html", user_avg=user_avg, global_avg=global_avg)
 
@@ -346,10 +646,10 @@ def stats():
 @ensure_user_id
 def save_base_color():
     """Save the current user's base color"""
-    user_avg = get_user_average(session["user_id"])
+    user_avg_tuple = get_user_average(session["user_id"])
 
-    if user_avg:
-        base_color = user_avg[0]
+    if user_avg_tuple:
+        base_color = user_avg_tuple[0]
         set_user_base_color(session["user_id"], base_color)
         return jsonify({"success": True, "base_color": base_color})
 

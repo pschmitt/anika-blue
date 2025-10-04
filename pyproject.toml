@@ -4,7 +4,7 @@ version = "0.1.0"
 description = "Interactive web application to discover your perfect shade of blue"
 readme = "README.md"
 requires-python = ">=3.12"
-dependencies = ["flask>=3.1.2", "pillow>=11.3.0"]
+dependencies = ["flask>=3.1.2", "pillow>=11.3.0", "webcolors>=24.6.0"]
 
 [project.optional-dependencies]
 dev = [

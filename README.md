@@ -8,6 +8,7 @@ An interactive web application to help you discover your perfect shade of blue! 
 - **Personal Average**: Track your own "Anika Blue" based on your votes
 - **Global Average**: See what the community collectively defines as "Anika Blue"
 - **Hex Codes**: All shades display their hex color codes
+- **Color Names**: Every shade is paired with a human-friendly CSS color name
 - **Session Tracking**: Each user has their own persistent session
 - **Dynamic Updates**: Smooth, interactive experience without page reloads
 
@@ -25,17 +26,18 @@ An interactive web application to help you discover your perfect shade of blue! 
    nix run github:pschmitt/anika-blue
    ```
 
-3. **Python** (Development):
+3. **uv** (Development):
    ```bash
-   pip install uv && uv pip install flask pillow && python app.py
+   uv sync
+   uv run anika-blue
    ```
 
 See [DEPLOYMENT.md](DEPLOYMENT.md) for detailed deployment instructions.
 
 ### Prerequisites
 
-- Python 3.7 or higher
-- pip
+- Python 3.12 or higher
+- [uv](https://docs.astral.sh/uv/) (see the uv docs for installation instructions)
 
 Or use one of the alternative deployment methods below (Docker or Nix).
 
@@ -49,17 +51,12 @@ cd anika-blue
 
 2. Install dependencies:
 ```bash
-# Using uv (recommended)
-pip install uv
-uv pip install flask pillow
-
-# Or using pip directly
-pip install flask pillow
+uv sync
 ```
 
 3. Run the application:
 ```bash
-python app.py
+uv run anika-blue
 ```
 
 4. Open your browser and navigate to:
@@ -167,15 +164,11 @@ flake8 app.py tests/
 This project uses `pyproject.toml` for dependency management. Dependencies can be installed using:
 
 ```bash
-# Using uv (recommended)
-pip install uv
-uv pip install flask pillow
+# Install runtime dependencies
+uv sync
 
-# Development dependencies
-uv pip install pytest black flake8
-
-# Or using pip directly
-pip install flask pillow pytest black flake8
+# Install development extras
+uv sync --extra dev
 ```
 
 ## How It Works
@@ -184,7 +177,6 @@ pip install flask pillow pytest black flake8
 2. **Make Your Choice**:
    - Click "✓ Anika Blue" if you think it's Anika Blue
    - Click "❌ Not Anika Blue" if you don't think it's Anika Blue
-   - Click "⏭️ Skip" to skip the shade
 3. **Track Your Average**: Your personal Anika Blue average updates based on your "yes" votes
 4. **See the Global Average**: View what everyone collectively defines as Anika Blue
 
