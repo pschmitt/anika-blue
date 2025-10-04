@@ -27,7 +27,8 @@ jobs:
           python -m pip install --upgrade pip
           pip install .[dev]
 
-      - name: Run pytest
-        uses: pytest-dev/pytest-action@v1
+      - uses: pavelzw/pytest-action@v2
         with:
-          args: "-v tests"
+          emoji: true
+          verbose: false
+          job-summary: true
