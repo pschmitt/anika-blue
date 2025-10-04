@@ -10,8 +10,6 @@ dependencies = ["flask>=3.1.2", "pillow>=11.3.0"]
 dev = [
   "black>=24.0.0",
   "flake8>=7.0.0",
-  "pytest-emoji>=0.2.0",
-  "pytest-markdown>=0.0.7",
   "pytest>=8.3.0",
 ]
 

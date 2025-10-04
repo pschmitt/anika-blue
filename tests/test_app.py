@@ -1,10 +1,12 @@
 """Tests for the Anika Blue application."""
 
-import pytest
 import os
-import tempfile
 import sqlite3
-from app import (
+import tempfile
+from importlib import import_module
+
+import pytest
+from anika_blue.app import (
     app,
     init_db,
     generate_blue_shade,
@@ -14,6 +16,12 @@ from app import (
     set_user_base_color,
     find_user_by_base_color,
 )
+
+
+def get_app_module():
+    """Import the app module dynamically to access module-level constants."""
+
+    return import_module("anika_blue.app")
 
 
 @pytest.fixture
@@ -38,7 +46,7 @@ def client():
 @pytest.fixture
 def db_connection():
     """Create a test database connection."""
-    import app as app_module
+    app_module = get_app_module()
 
     db_fd, db_path = tempfile.mkstemp()
 
@@ -118,7 +126,7 @@ class TestColorAveraging:
 
     def test_get_user_average_no_choices(self, db_connection):
         """Test that user average returns None when no choices exist."""
-        import app as app_module
+        app_module = get_app_module()
 
         app_module.DATABASE = db_connection
         result = get_user_average("test_user")
@@ -126,7 +134,7 @@ class TestColorAveraging:
 
     def test_get_user_average_with_choices(self, db_connection):
         """Test that user average is calculated correctly."""
-        import app as app_module
+        app_module = get_app_module()
 
         conn = sqlite3.connect(db_connection)
         cursor = conn.cursor()
@@ -155,7 +163,7 @@ class TestColorAveraging:
 
     def test_get_global_average_no_choices(self, db_connection):
         """Test that global average returns None when no choices exist."""
-        import app as app_module
+        app_module = get_app_module()
 
         app_module.DATABASE = db_connection
         result = get_global_average()
@@ -163,7 +171,7 @@ class TestColorAveraging:
 
     def test_get_global_average_with_choices(self, db_connection):
         """Test that global average is calculated correctly."""
-        import app as app_module
+        app_module = get_app_module()
 
         conn = sqlite3.connect(db_connection)
         cursor = conn.cursor()
@@ -196,7 +204,7 @@ class TestBaseColor:
 
     def test_get_user_base_color_not_set(self, db_connection):
         """Test that base color returns None when not set."""
-        import app as app_module
+        app_module = get_app_module()
 
         app_module.DATABASE = db_connection
         result = get_user_base_color("test_user")
@@ -204,7 +212,7 @@ class TestBaseColor:
 
     def test_set_and_get_user_base_color(self, db_connection):
         """Test setting and getting user base color."""
-        import app as app_module
+        app_module = get_app_module()
 
         app_module.DATABASE = db_connection
         test_color = "#667eea"
@@ -216,7 +224,7 @@ class TestBaseColor:
 
     def test_find_user_by_base_color(self, db_connection):
         """Test finding user by base color."""
-        import app as app_module
+        app_module = get_app_module()
 
         app_module.DATABASE = db_connection
         test_color = "#667eea"
@@ -229,7 +237,7 @@ class TestBaseColor:
 
     def test_find_user_by_base_color_not_found(self, db_connection):
         """Test finding user by base color when not found."""
-        import app as app_module
+        app_module = get_app_module()
 
         app_module.DATABASE = db_connection
         result = find_user_by_base_color("#ffffff")
