@@ -66,7 +66,7 @@
         }
 
         .card-container {
-            background: rgba(218, 222, 233, 0.92);
+            background: rgba(199, 205, 220, 0.9);
             border-radius: 24px;
             box-shadow: 0 20px 60px rgba(0,0,0,0.3);
             overflow: hidden;
@@ -303,8 +303,6 @@
             justify-content: space-between;
             gap: 12px;
             margin-bottom: 16px;
-            position: relative;
-            padding-right: 70px;
         }
 
         .restore-pill {
@@ -317,20 +315,19 @@
             font-weight: 600;
             cursor: pointer;
             letter-spacing: 0.4px;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            transition: box-shadow 0.2s ease;
             white-space: nowrap;
-            position: absolute;
-            top: 0;
-            right: 0;
         }
 
-        .restore-pill:hover {
-            transform: translateY(-1px);
+        .stat-header .restore-pill {
+            margin-left: auto;
+        }
+
+        .restore-pill:hover,
+        .restore-pill:active,
+        .stat-empty.inline-action .restore-pill {
             box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
-        }
-
-        .restore-pill:active {
-            transform: translateY(0);
+            transform: none;
         }
 
         .stat-color {
@@ -346,6 +343,18 @@
             padding: 24px 16px;
             background: rgba(255, 255, 255, 0.35);
             border-radius: 12px;
+        }
+
+        .stat-empty.inline-action {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            align-items: center;
+            text-align: center;
+        }
+
+        .stat-empty.inline-action button {
+            align-self: center;
         }
 
         .color-swatch {
@@ -1152,7 +1161,7 @@
 
         function openRestoreModal(event) {
             const trigger = event?.currentTarget || event?.target;
-            if (trigger) {
+            if (trigger && !trigger.classList.contains('restore-pill')) {
                 trigger.classList.add('animate-success');
                 setTimeout(() => trigger.classList.remove('animate-success'), 400);
             }
