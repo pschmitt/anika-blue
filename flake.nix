@@ -117,7 +117,10 @@
           ...
         }:
         let
-          pythonEnv = pkgs.python312.withPackages (ps: with ps; [ flask ]);
+          pythonEnv = pkgs.python312.withPackages (ps: with ps; [
+            flask
+            pillow
+          ]);
 
           anika-blue = pkgs.stdenv.mkDerivation {
             pname = "anika-blue";
