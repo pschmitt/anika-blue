@@ -12,9 +12,18 @@
             box-sizing: border-box;
         }
 
+        html {
+            min-height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background-attachment: fixed;
+            background-repeat: no-repeat;
+        }
+
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background-attachment: fixed;
+            background-repeat: no-repeat;
             min-height: 100vh;
             display: flex;
             justify-content: center;
@@ -45,7 +54,7 @@
         }
 
         .card-container {
-            background: white;
+            background: rgba(218, 222, 233, 0.92);
             border-radius: 20px;
             box-shadow: 0 20px 60px rgba(0,0,0,0.3);
             overflow: hidden;
@@ -78,6 +87,7 @@
             display: flex;
             justify-content: center;
             gap: 15px;
+            background: rgba(209, 214, 226, 0.88);
         }
 
         button {
@@ -127,18 +137,6 @@
             }
         }
 
-        @keyframes copy-button-success {
-            0% {
-                transform: translateY(-50%) scale(1);
-            }
-            50% {
-                transform: translateY(-50%) scale(1.05);
-            }
-            100% {
-                transform: translateY(-50%) scale(1);
-            }
-        }
-
         .animate-success {
             animation: button-success 0.4s ease;
         }
@@ -160,7 +158,7 @@
 
         .stats-container {
             margin-top: 30px;
-            background: rgba(255,255,255,0.95);
+            background: rgba(199, 205, 220, 0.9);
             border-radius: 15px;
             padding: 20px;
         }
@@ -208,7 +206,7 @@
 
         .color-count {
             font-size: 0.9rem;
-            color: #999;
+            color: #2b3148;
         }
 
         .loading {
@@ -372,8 +370,9 @@
             transform: translateY(-50%);
         }
 
-        .modal-copy-btn.copy-animate-success {
-            animation: copy-button-success 0.4s ease;
+        .modal-copy-btn.copy-feedback {
+            background: rgba(102, 126, 234, 0.18);
+            color: #4c51bf;
         }
 
         .modal-actions {
@@ -983,8 +982,8 @@
                 return;
             }
             if (button) {
-                button.classList.add('copy-animate-success');
-                setTimeout(() => button.classList.remove('copy-animate-success'), 400);
+                button.classList.add('copy-feedback');
+                setTimeout(() => button.classList.remove('copy-feedback'), 250);
             }
 
             if (!input) {
