@@ -234,11 +234,11 @@
               echo "Flask: $(python -c 'import importlib.metadata; print(importlib.metadata.version("flask"))')"
               echo
               echo "Commands:"
-              echo "  python -m anika_blue    - Start development server"
-              echo "  pytest tests/ -v        - Run tests"
-              echo "  black .                 - Format code"
-              echo "  ruff anika_blue tests/  - Lint code"
-              echo "  nix build '.#docker'    - Build Docker image"
+              echo "  python -m anika_blue          # Start development server"
+              echo "  pytest tests/ -v              # Run tests"
+              echo "  black .                       # Format code"
+              echo "  ruff check anika_blue tests/  # Lint code"
+              echo "  nix build '.#docker'          # Build Docker image"
               echo
               export DATABASE="''${DATABASE:-$PWD/anika_blue.db}"
             '';
