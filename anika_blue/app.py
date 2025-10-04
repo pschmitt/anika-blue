@@ -1,7 +1,9 @@
+import hashlib
 import os
 import random
 import secrets
 import sqlite3
+import time
 from functools import wraps
 from io import BytesIO
 from pathlib import Path
@@ -16,12 +18,63 @@ DATABASE = os.environ.get("DATABASE", "anika_blue.db")
 DEBUG = os.environ.get("DEBUG") is not None
 SECRET_KEY = os.environ.get("SECRET_KEY", secrets.token_hex(32))
 
+LIVERELOAD_POLL_INTERVAL = float(os.environ.get("LIVERELOAD_POLL_INTERVAL", 1.5))
+_LIVERELOAD_CACHE = {"token": None, "timestamp": 0.0}
+WATCH_TARGETS = [
+    BASE_DIR / "templates",
+    BASE_DIR / "static",
+    BASE_DIR / "app.py",
+    BASE_DIR / "__main__.py",
+]
+
 app = Flask(
     __name__,
     template_folder=str(BASE_DIR / "templates"),
     static_folder=str(BASE_DIR / "static"),
 )
 app.secret_key = SECRET_KEY
+
+if DEBUG:
+    app.config["TEMPLATES_AUTO_RELOAD"] = True
+    app.jinja_env.auto_reload = True
+
+
+def compute_live_reload_token() -> str:
+    digest = hashlib.sha1()
+
+    for target in WATCH_TARGETS:
+        if not target.exists():
+            continue
+
+        if target.is_file():
+            stat = target.stat()
+            digest.update(str(target.relative_to(BASE_DIR.parent)).encode("utf-8"))
+            digest.update(str(stat.st_mtime_ns).encode("utf-8"))
+            continue
+
+        for path in sorted(target.rglob("*")):
+            if "__pycache__" in path.parts or path.suffix in {".pyc", ".pyo"}:
+                continue
+
+            if not path.is_file():
+                continue
+            stat = path.stat()
+            digest.update(str(path.relative_to(BASE_DIR.parent)).encode("utf-8"))
+            digest.update(str(stat.st_mtime_ns).encode("utf-8"))
+
+    return digest.hexdigest()
+
+
+def get_live_reload_token() -> str:
+    now = time.monotonic()
+    token = _LIVERELOAD_CACHE.get("token")
+    timestamp = _LIVERELOAD_CACHE.get("timestamp", 0.0)
+
+    if token is None or (now - timestamp) >= LIVERELOAD_POLL_INTERVAL:
+        token = compute_live_reload_token()
+        _LIVERELOAD_CACHE.update({"token": token, "timestamp": now})
+
+    return token
 
 
 def init_db():
@@ -191,7 +244,28 @@ def find_user_by_base_color(base_color):
 @app.route("/")
 @ensure_user_id
 def index():
-    return render_template("index.html")
+    return render_template(
+        "index.html",
+        debug=DEBUG,
+        livereload_token=get_live_reload_token() if DEBUG else None,
+        livereload_interval=int(LIVERELOAD_POLL_INTERVAL * 1000),
+    )
+
+
+@app.route("/__livereload")
+def livereload_endpoint():
+    if not DEBUG:
+        return jsonify({"enabled": False}), 404
+
+    response = jsonify(
+        {
+            "enabled": True,
+            "version": get_live_reload_token(),
+            "interval": LIVERELOAD_POLL_INTERVAL,
+        }
+    )
+    response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
+    return response
 
 
 @app.route("/next-shade")

@@ -1,36 +1,53 @@
 <div class="stats-container">
     {% if user_avg %}
     <div class="stat-item">
-        <div class="stat-label">Your Anika Blue</div>
+        <div class="stat-header">
+            <div class="stat-label">Your Anika Blue</div>
+            <button class="restore-pill" onclick="openRestoreModal(event)">🔄 Restore</button>
+        </div>
         <div class="stat-color">
-            <div class="color-swatch" style="background-color: {{ user_avg[0] }};"></div>
+            <div
+                class="color-swatch copyable"
+                style="background-color: {{ user_avg[0] }};"
+                role="button"
+                tabindex="0"
+                data-copy-role="user"
+                aria-label="Copy your Anika Blue {{ user_avg[0] }} to clipboard"
+                title="Tap to copy"
+            ></div>
             <div class="color-info">
                 <div class="color-hex" data-color-role="user">{{ user_avg[0] }}</div>
                 <div class="color-count">Based on {{ user_avg[1] }} choice{{ 's' if user_avg[1] != 1 else '' }}</div>
-            </div>
-            <div class="color-actions">
-                <button class="save-color-btn" onclick="saveBaseColor(event)">📋 Copy</button>
-                <button class="restore-color-btn" onclick="openRestoreModal(event)">🔄 Restore</button>
             </div>
         </div>
     </div>
     {% else %}
     <div class="stat-item">
-        <div class="stat-label">Your Anika Blue</div>
-        <div style="text-align: center; color: #2b3148; padding: 20px;">
-            Make your first choice to see your Anika Blue!
+        <div class="stat-header">
+            <div class="stat-label">Your Anika Blue</div>
+            <button class="restore-pill" onclick="openRestoreModal(event)">🔄 Restore</button>
         </div>
-        <div class="color-actions centered">
-            <button class="restore-color-btn" onclick="openRestoreModal(event)">🔄 Restore</button>
+        <div class="stat-empty">
+            Make your first choice to see your Anika Blue!
         </div>
     </div>
     {% endif %}
 
     {% if global_avg %}
     <div class="stat-item">
-        <div class="stat-label">Global Anika Blue</div>
+        <div class="stat-header">
+            <div class="stat-label">Global Anika Blue</div>
+        </div>
         <div class="stat-color">
-            <div class="color-swatch" style="background-color: {{ global_avg[0] }};"></div>
+            <div
+                class="color-swatch copyable"
+                style="background-color: {{ global_avg[0] }};"
+                role="button"
+                tabindex="0"
+                data-copy-role="global"
+                aria-label="Copy the global Anika Blue {{ global_avg[0] }} to clipboard"
+                title="Tap to copy"
+            ></div>
             <div class="color-info">
                 <div class="color-hex" data-color-role="global">{{ global_avg[0] }}</div>
                 <div class="color-count">Based on {{ global_avg[1] }} choice{{ 's' if global_avg[1] != 1 else '' }} from all users</div>

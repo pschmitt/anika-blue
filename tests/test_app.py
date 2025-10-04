@@ -276,23 +276,23 @@ class TestRoutes:
         """Test that votes are counted correctly without duplicates."""
         app_module = get_app_module()
         app_module.DATABASE = db_connection
-        
+
         # Set up a session
         with client.session_transaction() as sess:
             sess["user_id"] = "test_user"
-        
+
         # Vote on three different shades
         client.post("/vote", data={"shade": "#0000ff", "choice": "yes"})
         client.post("/vote", data={"shade": "#00ff00", "choice": "yes"})
         client.post("/vote", data={"shade": "#ff0000", "choice": "no"})
-        
+
         # Count votes in database
         conn = sqlite3.connect(db_connection)
         c = conn.cursor()
         c.execute("SELECT COUNT(*) FROM choices")
         count = c.fetchone()[0]
         conn.close()
-        
+
         # Should have exactly 3 votes (one for each call)
         assert count == 3
 
