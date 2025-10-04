@@ -123,6 +123,19 @@
             ]
           );
 
+          cleanSrc = pkgs.lib.cleanSourceWith {
+            src = ./.;
+            filter = path: type:
+              let
+                base = builtins.baseNameOf path;
+              in
+              pkgs.lib.cleanSourceFilter path type
+              && base != "__pycache__"
+              && base != ".pytest_cache"
+              && base != "result"
+              && base != "dist";
+          };
+
           anika-blue = pkgs.python3Packages.buildPythonPackage {
             pname = "anika-blue";
             version = "0.1.0";
@@ -163,23 +176,31 @@
             ];
 
             config = {
-              Cmd = [
-                # "${pythonEnv}/bin/python"
-                # "-m"
-                "anika_blue"
-              ];
+              Cmd = [ "python" "-m" "anika_blue" ];
               WorkingDir = "/app";
               ExposedPorts."5000/tcp" = { };
               Env = [
                 "DATABASE=/data/anika_blue.db"
+                "BIND_HOST=0.0.0.0"
+                "BIND_PORT=5000"
                 "PYTHONUNBUFFERED=1"
+                "PYTHONPATH=/app"
               ];
+              Healthcheck = {
+                Test = [
+                  "CMD-SHELL"
+                  "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:5000/').read()\" || exit 1"
+                ];
+                Interval = 30000000000; # 30s in nanoseconds
+                Timeout = 3000000000; # 3s
+                StartPeriod = 5000000000; # 5s
+                Retries = 3;
+              };
             };
 
             extraCommands = ''
               mkdir -p app data
-              cp ${./anika_blue} app/anika_blue
-              cp -r ${./templates} app/templates
+              cp -R ${cleanSrc}/. app/
             '';
           };
         in
