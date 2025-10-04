@@ -215,11 +215,6 @@
             color: white;
         }
 
-        .btn-skip {
-            background: #e0e0e0;
-            color: #666;
-        }
-
         .stats-container {
             margin-top: 20px;
             background: rgba(199, 205, 220, 0.9);
@@ -232,11 +227,18 @@
             align-items: center;
             justify-content: center;
             color: var(--page-foreground);
-            font-size: 1.35rem;
+            font-size: 1.1rem;
             line-height: 1;
             align-self: center;
             animation: indicator-bounce 2s infinite;
-            margin-bottom: calc(env(safe-area-inset-bottom, 0px) + 6px);
+            margin-top: -10px;
+            margin-bottom: calc(env(safe-area-inset-bottom, 0px) + 2px);
+        }
+
+        @media (min-width: 768px) {
+            .scroll-indicator {
+                display: none;
+            }
         }
 
         @keyframes indicator-bounce {
@@ -280,8 +282,8 @@
             color: white;
             border: none;
             border-radius: 999px;
-            padding: 4px 14px;
-            font-size: 0.78rem;
+            padding: 4px 10px;
+            font-size: 0.72rem;
             font-weight: 600;
             cursor: pointer;
             letter-spacing: 0.4px;
@@ -387,8 +389,8 @@
             }
 
             .restore-pill {
-                font-size: 0.72rem;
-                padding: 4px 12px;
+                font-size: 0.68rem;
+                padding: 4px 10px;
             }
         }
 
@@ -732,7 +734,7 @@
             </div>
         </div>
 
-        <div class="scroll-indicator" role="presentation" aria-hidden="true">↓</div>
+        <div class="scroll-indicator" role="presentation" aria-hidden="true">⌄</div>
 
         <div id="stats-container">
         </div>
@@ -922,7 +924,6 @@
         function attachButtonListeners() {
             attachVoteHandler('.btn-yes', 'yes');
             attachVoteHandler('.btn-no', 'no');
-            attachVoteHandler('.btn-skip', 'skip');
             attachHexCopy();
         }
 
