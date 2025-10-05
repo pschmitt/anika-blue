@@ -74,6 +74,15 @@ ruff check . --fix
 - `anika_blue/templates/` - HTML templates (mainly `index.html`)
 - `tests/` - Test files
 - Database: SQLite (`anika_blue.db`)
+- `flake.nix` - Nix flake for reproducible builds and dependencies
+- `pyproject.toml` - Python project configuration and dependencies
+
+## Dependency Management
+- **Python dependencies** are defined in `pyproject.toml`
+- **Nix dependencies** must be kept in sync in `flake.nix`:
+  - Add to `pythonEnv` for development shell
+  - Add to `propagatedBuildInputs` for package builds
+- When adding new Python packages, update both files
 
 ## Notes for Agents
 - This is a Flask web application for voting on shades of blue

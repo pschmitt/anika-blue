@@ -120,6 +120,7 @@
             ps: with ps; [
               flask
               pillow
+              webcolors
             ]
           );
 
@@ -149,6 +150,7 @@
             propagatedBuildInputs = with pkgs.python3Packages; [
               flask
               pillow
+              webcolors
             ];
 
             # Sanity check import at build time
