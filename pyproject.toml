@@ -3,7 +3,7 @@ name = "anika-blue"
 version = "0.1.0"
 description = "Interactive web application to discover your perfect shade of blue"
 readme = "README.md"
-requires-python = ">=3.12"
+requires-python = ">=3.13"
 dependencies = ["flask>=3.1.2", "pillow>=11.3.0", "webcolors>=24.6.0"]
 
 [project.optional-dependencies]
@@ -26,4 +26,4 @@ module-root = ""
 
 [tool.black]
 line-length = 88
-target-version = ['py312']
+target-version = ['py313']
