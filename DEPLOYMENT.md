@@ -202,7 +202,7 @@ source venv/bin/activate  # On Windows: venv\Scripts\activate
 pip install uv
 uv pip install flask pillow
 
-# Or using pip directly  
+# Or using pip directly
 pip install flask pillow
 ```
 

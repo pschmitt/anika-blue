@@ -274,6 +274,7 @@ class TestRoutes:
         assert b"#" in response.data
         assert b"shade-name" in response.data
         assert b"data-shade-combined" in response.data
+        assert b"data-copy-text" in response.data
 
     def test_vote_route(self, client):
         """Test that vote route processes votes correctly."""
@@ -317,6 +318,27 @@ class TestRoutes:
         """Test that stats route returns successfully."""
         response = client.get("/stats")
         assert response.status_code == 200
+
+    def test_stats_route_contains_copy_text_after_vote(self, client, db_connection):
+        """Stats HTML exposes copy targets when data is available."""
+        app_module = get_app_module()
+        app_module.DATABASE = db_connection
+
+        with client.session_transaction() as sess:
+            sess["user_id"] = "test_user"
+
+        conn = sqlite3.connect(db_connection)
+        cursor = conn.cursor()
+        cursor.execute(
+            "INSERT INTO votes (user_id, hex_color, is_anika_blue) VALUES (?, ?, ?)",
+            ("test_user", "#0000ff", 1),
+        )
+        conn.commit()
+        conn.close()
+
+        response = client.get("/stats")
+        assert response.status_code == 200
+        assert b"data-copy-text" in response.data
 
     def test_save_base_color_no_average(self, client):
         """Test saving base color when no average exists."""

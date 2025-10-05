@@ -15,14 +15,34 @@
                 title="Tap to copy"
             ></div>
             <div class="color-info">
-                <div class="color-hex" data-color-role="user">{{ user_avg.hex }}</div>
-                <div class="color-name">{{ user_avg.combined_name }}</div>
+                <div class="color-row">
+                    <div
+                        class="color-hex copyable-container"
+                        data-color-role="user"
+                        role="button"
+                        tabindex="0"
+                        aria-label="Copy {{ user_avg.hex }}"
+                        data-copy-text="{{ user_avg.hex }}"
+                    >{{ user_avg.hex }}</div>
+                    <div
+                        class="color-name copyable-container"
+                        role="button"
+                        tabindex="0"
+                        aria-label="Copy {{ user_avg.combined_name }}"
+                        data-copy-text="{{ user_avg.combined_name }}"
+                    >
+                        <span class="copyable-text" tabindex="0" role="button" aria-label="Copy {{ user_avg.descriptive_name }}" data-copy-text="{{ user_avg.descriptive_name }}">{{ user_avg.descriptive_name }}</span>
+                        {% if user_avg.css_name %}
+                        / <span class="copyable-text" tabindex="0" role="button" aria-label="Copy {{ user_avg.css_name }}" data-copy-text="{{ user_avg.css_name }}">{{ user_avg.css_display_name }}</span>
+                        {% endif %}
+                    </div>
+                </div>
                 <div class="color-count">Based on {{ user_avg.count }} vote{{ 's' if user_avg.count != 1 else '' }}</div>
             </div>
         </div>
     </div>
     {% else %}
-    <div class="stat-item">
+        <div class="stat-item">
         <div class="stat-header">
             <div class="stat-label">Your Anika Blue value</div>
         </div>
@@ -49,8 +69,28 @@
                 title="Tap to copy"
             ></div>
             <div class="color-info">
-                <div class="color-hex" data-color-role="global">{{ global_avg.hex }}</div>
-                <div class="color-name">{{ global_avg.combined_name }}</div>
+                <div class="color-row">
+                    <div
+                        class="color-hex copyable-container"
+                        data-color-role="global"
+                        role="button"
+                        tabindex="0"
+                        aria-label="Copy {{ global_avg.hex }}"
+                        data-copy-text="{{ global_avg.hex }}"
+                    >{{ global_avg.hex }}</div>
+                    <div
+                        class="color-name copyable-container"
+                        role="button"
+                        tabindex="0"
+                        aria-label="Copy {{ global_avg.combined_name }}"
+                        data-copy-text="{{ global_avg.combined_name }}"
+                    >
+                        <span class="copyable-text" tabindex="0" role="button" aria-label="Copy {{ global_avg.descriptive_name }}" data-copy-text="{{ global_avg.descriptive_name }}">{{ global_avg.descriptive_name }}</span>
+                        {% if global_avg.css_name %}
+                        / <span class="copyable-text" tabindex="0" role="button" aria-label="Copy {{ global_avg.css_name }}" data-copy-text="{{ global_avg.css_name }}">{{ global_avg.css_display_name }}</span>
+                        {% endif %}
+                    </div>
+                </div>
                 <div class="color-count">Based on {{ global_avg.count }} vote{{ 's' if global_avg.count != 1 else '' }} from all users</div>
             </div>
         </div>

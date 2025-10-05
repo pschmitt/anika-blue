@@ -12,7 +12,18 @@
             aria-label="Copy {{ shade }} ({{ shade_details.combined_name }}) to clipboard"
             title="Tap to copy"
         >{{ shade }}</div>
-        <div class="shade-name">{{ shade_details.combined_name }}</div>
+        <div
+            class="shade-name copyable-container"
+            role="button"
+            tabindex="0"
+            aria-label="Copy {{ shade_details.combined_name }}"
+            data-copy-text="{{ shade_details.combined_name }}"
+        >
+            <span class="copyable-text" tabindex="0" role="button" aria-label="Copy {{ shade_details.descriptive_name }}" data-copy-text="{{ shade_details.descriptive_name }}">{{ shade_details.descriptive_name }}</span>
+            {% if shade_details.css_name %}
+            / <span class="copyable-text" tabindex="0" role="button" aria-label="Copy {{ shade_details.css_name }}" data-copy-text="{{ shade_details.css_name }}">{{ shade_details.css_display_name }}</span>
+            {% endif %}
+        </div>
     </div>
 </div>
 <div class="controls">

@@ -185,9 +185,7 @@ def init_db():
     c = conn.cursor()
 
     # Table for user votes (with migration support for legacy "choices" table)
-    c.execute(
-        "SELECT name FROM sqlite_master WHERE type='table' AND name='votes'"
-    )
+    c.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='votes'")
     has_votes_table = c.fetchone() is not None
 
     if not has_votes_table:
