@@ -126,7 +126,8 @@
 
           cleanSrc = pkgs.lib.cleanSourceWith {
             src = ./.;
-            filter = path: type:
+            filter =
+              path: type:
               let
                 base = builtins.baseNameOf path;
               in
@@ -160,7 +161,7 @@
               description = "Interactive web application to discover your perfect shade of blue";
               homepage = "https://github.com/pschmitt/anika-blue";
               license = licenses.gpl3Only;
-              maintainers = [ ];
+              maintainers = [ maintainers.pschmitt ];
               platforms = platforms.all;
               mainProgram = "anika-blue";
             };
@@ -178,7 +179,11 @@
             ];
 
             config = {
-              Cmd = [ "python" "-m" "anika_blue" ];
+              Cmd = [
+                "python"
+                "-m"
+                "anika_blue"
+              ];
               WorkingDir = "/app";
               ExposedPorts."5000/tcp" = { };
               Env = [
