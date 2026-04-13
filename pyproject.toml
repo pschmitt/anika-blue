@@ -10,7 +10,7 @@ dependencies = ["flask>=3.1.2", "pillow>=11.3.0", "webcolors>=24.6.0"]
 dev = [
   "black>=24.0.0",
   "flake8>=7.0.0",
-  "pytest>=8.3.0",
+  "pytest>=9.0.3",
 ]
 
 [project.scripts]
