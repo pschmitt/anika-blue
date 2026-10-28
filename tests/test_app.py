@@ -79,10 +79,8 @@ class TestDatabase:
         cursor = conn.cursor()
 
         # Check if tables exist
-        cursor.execute(
-            """SELECT name FROM sqlite_master
-               WHERE type='table' AND name='votes'"""
-        )
+        cursor.execute("""SELECT name FROM sqlite_master
+               WHERE type='table' AND name='votes'""")
         assert cursor.fetchone() is not None
 
         cursor.execute(
@@ -90,10 +88,8 @@ class TestDatabase:
         )
         assert cursor.fetchone() is not None
 
-        cursor.execute(
-            """SELECT name FROM sqlite_master
-               WHERE type='table' AND name='user_base_colors'"""
-        )
+        cursor.execute("""SELECT name FROM sqlite_master
+               WHERE type='table' AND name='user_base_colors'""")
         assert cursor.fetchone() is not None
 
         conn.close()
