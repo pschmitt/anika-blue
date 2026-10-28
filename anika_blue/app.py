@@ -10,9 +10,9 @@ from functools import wraps
 from io import BytesIO
 from pathlib import Path
 
+import webcolors
 from flask import Flask, jsonify, render_template, request, send_file, session
 from PIL import Image
-import webcolors
 
 CSS3_NAME_LIST = webcolors.names(webcolors.CSS3)
 CSS3_HEX_TO_NAMES = {
@@ -116,12 +116,12 @@ COLOR_NAME_SUFFIXES = sorted(
 
 BASE_DIR = Path(__file__).resolve().parent
 BIND_HOST = os.environ.get("BIND_HOST", "0.0.0.0")
-BIND_PORT = int(os.environ.get("BIND_PORT", 5000))
+BIND_PORT = int(os.environ.get("BIND_PORT", "5000"))
 DATABASE = os.environ.get("DATABASE", "anika_blue.db")
 DEBUG = os.environ.get("DEBUG") is not None
 SECRET_KEY = os.environ.get("SECRET_KEY", secrets.token_hex(32))
 
-LIVERELOAD_POLL_INTERVAL = float(os.environ.get("LIVERELOAD_POLL_INTERVAL", 1.5))
+LIVERELOAD_POLL_INTERVAL = float(os.environ.get("LIVERELOAD_POLL_INTERVAL", "1.5"))
 _LIVERELOAD_CACHE = {"token": None, "timestamp": 0.0}
 WATCH_TARGETS = [
     BASE_DIR / "templates",
@@ -197,31 +197,25 @@ def init_db():
         if legacy_choices_table:
             c.execute("ALTER TABLE choices RENAME TO votes")
 
-    c.execute(
-        """CREATE TABLE IF NOT EXISTS votes
+    c.execute("""CREATE TABLE IF NOT EXISTS votes
                  (id INTEGER PRIMARY KEY AUTOINCREMENT,
                   user_id TEXT NOT NULL,
                   hex_color TEXT NOT NULL,
                   is_anika_blue INTEGER NOT NULL,
-                  timestamp DATETIME DEFAULT CURRENT_TIMESTAMP)"""
-    )
+                  timestamp DATETIME DEFAULT CURRENT_TIMESTAMP)""")
 
     # Table for shades already shown to users
-    c.execute(
-        """CREATE TABLE IF NOT EXISTS shown_shades
+    c.execute("""CREATE TABLE IF NOT EXISTS shown_shades
                  (id INTEGER PRIMARY KEY AUTOINCREMENT,
                   user_id TEXT NOT NULL,
                   hex_color TEXT NOT NULL,
-                  timestamp DATETIME DEFAULT CURRENT_TIMESTAMP)"""
-    )
+                  timestamp DATETIME DEFAULT CURRENT_TIMESTAMP)""")
 
     # Table for user base colors (for cross-session/device identification)
-    c.execute(
-        """CREATE TABLE IF NOT EXISTS user_base_colors
+    c.execute("""CREATE TABLE IF NOT EXISTS user_base_colors
                  (user_id TEXT PRIMARY KEY,
                   base_color TEXT NOT NULL,
-                  timestamp DATETIME DEFAULT CURRENT_TIMESTAMP)"""
-    )
+                  timestamp DATETIME DEFAULT CURRENT_TIMESTAMP)""")
 
     conn.commit()
     conn.close()
@@ -336,19 +330,19 @@ def describe_color(hex_color: str | None) -> str:
     except ValueError:
         return "Unknown Color"
 
-    h, l, s = colorsys.rgb_to_hls(r, g, b)
-    h_deg = (h * 360.0) % 360.0
+    hue, lightness, saturation = colorsys.rgb_to_hls(r, g, b)
+    h_deg = (hue * 360.0) % 360.0
 
-    if s < 0.12:
-        if l < 0.08:
+    if saturation < 0.12:
+        if lightness < 0.08:
             return "Near Black"
-        if l < 0.22:
+        if lightness < 0.22:
             return "Very Dark Gray"
-        if l < 0.38:
+        if lightness < 0.38:
             return "Dark Gray"
-        if l < 0.65:
+        if lightness < 0.65:
             return "Neutral Gray"
-        if l < 0.85:
+        if lightness < 0.85:
             return "Light Gray"
         return "Near White"
 
@@ -380,22 +374,22 @@ def describe_color(hex_color: str | None) -> str:
                 hue_name = name
                 break
 
-    if s < 0.28:
+    if saturation < 0.28:
         saturation_adj = "Soft"
-    elif s < 0.55:
+    elif saturation < 0.55:
         saturation_adj = ""
-    elif s < 0.78:
+    elif saturation < 0.78:
         saturation_adj = "Vivid"
     else:
         saturation_adj = "Brilliant"
 
-    if l < 0.2:
+    if lightness < 0.2:
         lightness_adj = "Deep"
-    elif l < 0.35:
+    elif lightness < 0.35:
         lightness_adj = "Dark"
-    elif l < 0.5:
+    elif lightness < 0.5:
         lightness_adj = ""
-    elif l < 0.7:
+    elif lightness < 0.7:
         lightness_adj = "Light"
     else:
         lightness_adj = "Pale"
@@ -484,10 +478,8 @@ def get_global_average():
     conn = get_db()
     c = conn.cursor()
 
-    c.execute(
-        """SELECT hex_color FROM votes
-                 WHERE is_anika_blue = 1"""
-    )
+    c.execute("""SELECT hex_color FROM votes
+                 WHERE is_anika_blue = 1""")
 
     colors = [row["hex_color"] for row in c.fetchall()]
     conn.close()
