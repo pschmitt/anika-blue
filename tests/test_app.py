@@ -6,16 +6,17 @@ import tempfile
 from importlib import import_module
 
 import pytest
+
 from anika_blue.app import (
     app,
-    init_db,
-    generate_blue_shade,
-    get_user_average,
-    get_global_average,
-    get_user_base_color,
-    set_user_base_color,
     find_user_by_base_color,
+    generate_blue_shade,
     get_color_details,
+    get_global_average,
+    get_user_average,
+    get_user_base_color,
+    init_db,
+    set_user_base_color,
 )
 
 

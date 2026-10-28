@@ -10,9 +10,9 @@ from functools import wraps
 from io import BytesIO
 from pathlib import Path
 
+import webcolors
 from flask import Flask, jsonify, render_template, request, send_file, session
 from PIL import Image
-import webcolors
 
 CSS3_NAME_LIST = webcolors.names(webcolors.CSS3)
 CSS3_HEX_TO_NAMES = {
@@ -116,12 +116,12 @@ COLOR_NAME_SUFFIXES = sorted(
 
 BASE_DIR = Path(__file__).resolve().parent
 BIND_HOST = os.environ.get("BIND_HOST", "0.0.0.0")
-BIND_PORT = int(os.environ.get("BIND_PORT", 5000))
+BIND_PORT = int(os.environ.get("BIND_PORT", "5000"))
 DATABASE = os.environ.get("DATABASE", "anika_blue.db")
 DEBUG = os.environ.get("DEBUG") is not None
 SECRET_KEY = os.environ.get("SECRET_KEY", secrets.token_hex(32))
 
-LIVERELOAD_POLL_INTERVAL = float(os.environ.get("LIVERELOAD_POLL_INTERVAL", 1.5))
+LIVERELOAD_POLL_INTERVAL = float(os.environ.get("LIVERELOAD_POLL_INTERVAL", "1.5"))
 _LIVERELOAD_CACHE = {"token": None, "timestamp": 0.0}
 WATCH_TARGETS = [
     BASE_DIR / "templates",
