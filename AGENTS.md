@@ -2,6 +2,14 @@
 
 This document provides guidelines for AI agents working on the Anika Blue project to ensure consistent code quality and formatting.
 
+Anika Blue is an interactive web app for classifying shades of blue. Run the
+existing checks in the Testing and Code Formatting sections when changing
+application code.
+
+Before changing workflows, check for reusable workflows or actions in
+[ci-workflows](https://github.com/pschmitt/ci-workflows) and preserve existing
+triggers, inputs, permissions, and check coverage.
+
 ## Code Formatting
 
 ### Python Code
