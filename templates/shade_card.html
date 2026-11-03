@@ -1,0 +1,18 @@
+<figure
+    class="swatch"
+    data-shade="{{ shade }}"
+    data-ink="{{ shade_details.ink }}"
+    data-shade-name="{{ shade_details.descriptive_name }}"
+    data-shade-combined="{{ shade_details.combined_name }}"
+>
+    <span class="swatch-intent" aria-hidden="true"></span>
+    <figcaption class="swatch-caption">
+        <button type="button" class="chip hex" data-copy-text="{{ shade }}" aria-label="Copy {{ shade }}">{{ shade }}</button>
+        <span class="shade-name">
+            <button type="button" class="name" data-copy-text="{{ shade_details.descriptive_name }}" aria-label="Copy {{ shade_details.descriptive_name }}">{{ shade_details.descriptive_name }}</button>
+            {% if shade_details.css_name %}
+            <button type="button" class="name subtle" data-copy-text="{{ shade_details.css_name }}" aria-label="Copy {{ shade_details.css_name }}">{{ shade_details.css_display_name }}</button>
+            {% endif %}
+        </span>
+    </figcaption>
+</figure>

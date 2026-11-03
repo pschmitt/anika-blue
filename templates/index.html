@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en" style="--shade: {{ shade }}; --ink: {{ shade_details.ink }}">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="color-scheme" content="light dark">
+    <meta name="theme-color" content="{{ shade }}">
+    <meta name="description" content="Find your perfect shade of blue, one swatch at a time.">
+    <title>Anika Blue</title>
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="stylesheet" href="/static/app.css?v={{ asset_version }}">
+    <script src="/static/app.js?v={{ asset_version }}" defer></script>
+</head>
+<body>
+    <div class="app">
+        <header class="topbar">
+            <a class="brand" href="/"><span class="brand-dot" aria-hidden="true"></span>Anika Blue</a>
+            <button type="button" class="ghost" data-action="restore">Restore</button>
+        </header>
+
+        <main>
+            <section class="stage" aria-labelledby="prompt">
+                <h1 id="prompt" class="prompt">Is this <span>Anika Blue</span>?</h1>
+                <div id="card" class="card" aria-live="polite">
+                    {% include "shade_card.html" %}
+                </div>
+                <div class="actions">
+                    <button type="button" class="btn btn-no" data-vote="no">
+                        <kbd aria-hidden="true">←</kbd> Nope
+                    </button>
+                    <button type="button" class="btn btn-yes" data-vote="yes">
+                        Yes <kbd aria-hidden="true">→</kbd>
+                    </button>
+                </div>
+                <p class="hint">
+                    <button type="button" class="link" data-vote="skip">Skip</button>
+                    <span class="hint-touch">· or swipe the swatch</span>
+                </p>
+            </section>
+
+            <section id="stats" aria-live="polite" aria-label="Results">
+                {% include "stats.html" %}
+            </section>
+        </main>
+
+        <footer class="footer">
+            <span>Find your perfect shade of blue · FCK AFD</span>
+            <a href="https://github.com/pschmitt/anika-blue" target="_blank" rel="noopener noreferrer">GitHub</a>
+        </footer>
+    </div>
+
+    <dialog id="restore" class="dialog" aria-labelledby="restore-title">
+        <form id="restore-form" class="dialog-body" novalidate>
+            <h2 id="restore-title">Restore your session</h2>
+            <p class="muted">Your Anika Blue doubles as your key. Enter it to continue where you left off on another device.</p>
+            <label class="field">
+                <span id="restore-preview" class="field-swatch" aria-hidden="true"></span>
+                <input
+                    id="restore-input"
+                    name="base_color"
+                    type="text"
+                    inputmode="text"
+                    autocomplete="off"
+                    autocapitalize="off"
+                    spellcheck="false"
+                    placeholder="#1a2b3c"
+                    maxlength="7"
+                    aria-describedby="restore-hint"
+                >
+            </label>
+            <p id="restore-hint" class="field-hint" role="alert"></p>
+            <div class="dialog-actions">
+                <button type="button" class="btn btn-no" data-action="close">Cancel</button>
+                <button type="submit" class="btn btn-yes">Restore</button>
+            </div>
+        </form>
+    </dialog>
+
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+</body>
+</html>

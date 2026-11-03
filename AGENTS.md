@@ -1,100 +1,39 @@
 # Agent Guidelines for Anika Blue
 
-This document provides guidelines for AI agents working on the Anika Blue project to ensure consistent code quality and formatting.
-
-Anika Blue is an interactive web app for classifying shades of blue. Run the
-existing checks in the Testing and Code Formatting sections when changing
-application code.
+Anika Blue is a small web app for voting on shades of blue: a Rust (axum,
+MiniJinja, rusqlite) server with server-rendered templates and a little vanilla
+JavaScript. See [docs/development.md](docs/development.md) for the layout.
 
 Before changing workflows, check for reusable workflows or actions in
 [ci-workflows](https://github.com/pschmitt/ci-workflows) and preserve existing
 triggers, inputs, permissions, and check coverage.
 
-## Code Formatting
+## Checks
 
-### Python Code
-- **Always run `black`** on Python files for consistent formatting
-- **Always run `ruff format`** on Python files for additional formatting fixes
-- Use `ruff check` for linting and fix any issues when possible
+Run these before finishing a change (in `nix develop`):
 
-Example workflow:
-```bash
-# Format Python code
-black .
-ruff format .
-
-# Check for linting issues
-ruff check .
+```sh
+cargo fmt --check
+cargo clippy --all-targets -- -D warnings
+cargo test
+node --check static/app.js
+nixfmt --check flake.nix nix/*.nix && statix check . && deadnix --fail nix flake.nix
 ```
 
-### General File Maintenance
-- **Strip trailing whitespace** from all files
-- Ensure consistent line endings (LF)
-- Maintain consistent indentation (spaces, not tabs)
+Build on a remote build host, not on the machine the agent runs on.
 
-### File Types to Format
-- Python files (`.py`)
-- HTML templates (`.html`)
-- CSS files (`.css`)
-- JavaScript files (`.js`)
-- Markdown files (`.md`)
-- YAML files (`.yml`, `.yaml`)
-- TOML files (`.toml`)
-- Text files (`.txt`)
+## Conventions
 
-## Quick Formatting Commands
-
-### Strip Trailing Whitespace
-```bash
-find . -type f \( -name "*.py" -o -name "*.html" -o -name "*.css" -o -name "*.js" -o -name "*.md" -o -name "*.yml" -o -name "*.yaml" -o -name "*.toml" -o -name "*.txt" \) -not -path "./.venv/*" -not -path "./.git/*" -not -path "./.*cache*" -exec sed -i 's/[[:space:]]*$//' {} \;
-```
-
-### Full Python Formatting
-```bash
-# Activate virtual environment first
-source .venv/bin/activate
-
-# Format and lint
-black .
-ruff format .
-ruff check . --fix
-```
-
-## Testing
-- **Always run tests** after making changes: `python -m pytest tests/`
-- Ensure all existing tests pass before submitting changes
-- Do not fix unrelated test failures unless specifically asked
-
-## Development Server
-- Use virtual environment: `source .venv/bin/activate`
-- Start development server: `DEBUG=1 python -m anika_blue`
-- Default URL: http://127.0.0.1:5000
-
-## Code Quality Principles
-1. Make minimal, surgical changes to achieve the requested functionality
-2. Preserve existing working code unless modification is necessary
-3. Follow existing code patterns and conventions
-4. Maintain backward compatibility
-5. Document significant changes in commit messages
-
-## Project Structure
-- `anika_blue/app.py` - Main Flask application
-- `anika_blue/templates/` - HTML templates (mainly `index.html`)
-- `tests/` - Test files
-- Database: SQLite (`anika_blue.db`)
-- `flake.nix` - Nix flake for reproducible builds and dependencies
-- `pyproject.toml` - Python project configuration and dependencies
-
-## Dependency Management
-- **Python dependencies** are defined in `pyproject.toml`
-- **Nix dependencies** must be kept in sync in `flake.nix`:
-  - Add to `pythonEnv` for development shell
-  - Add to `propagatedBuildInputs` for package builds
-- When adding new Python packages, update both files
-
-## Notes for Agents
-- This is a Flask web application for voting on shades of blue
-- The main UI is in `anika_blue/templates/index.html` with embedded CSS and JavaScript
-- Color logic and voting functionality are implemented in `anika_blue/app.py`
-- Always test changes by starting the development server and verifying functionality
-- Pay attention to color accuracy in the preview display - users need to see exact colors they're voting on
+- Keep the frontend dependency-free: no JavaScript framework, no web fonts, no
+  build step. Templates and static files are embedded with `include_str!`.
+- Keep the first page complete after one request (shade and stats rendered
+  inline); the client prefetches the next shade so votes swap instantly.
+- Color accuracy matters: the swatch shows the exact shade on a neutral
+  background. Do not tint or filter it.
+- The SQLite schema must stay compatible with existing databases.
+- `src/css3.rs` is generated; regenerate it rather than editing names by hand.
+- When the UI changes visibly, refresh the README screenshots with
+  `tools/screenshots/run.sh` (made-up data only).
+- Dependencies: Cargo for Rust; the flake (crane) builds from `Cargo.lock`, so
+  no hashes need updating.
+- Strip trailing whitespace; use LF line endings and spaces for indentation.

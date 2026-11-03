@@ -1,14 +1,11 @@
+/target
 *.db
-*.pyc
-__pycache__/
-.venv/
-venv/
-env/
-.env
-.DS_Store
+*.db-shm
+*.db-wal
 *.sqlite
 *.sqlite3
-.pytest_cache/
+.env
+.DS_Store
 
 # Nix
 result

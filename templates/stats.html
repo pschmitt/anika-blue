@@ -1,0 +1,48 @@
+{% macro stat(title, avg, scope) -%}
+<article class="stat">
+    <button
+        type="button"
+        class="stat-swatch"
+        style="--c: {{ avg.hex }}"
+        data-copy-text="{{ avg.hex }}"
+        aria-label="Copy {{ avg.hex }}"
+    ></button>
+    <div class="stat-body">
+        <h2 class="stat-label">{{ title }}</h2>
+        <button type="button" class="stat-hex" data-copy-text="{{ avg.hex }}" aria-label="Copy {{ avg.hex }}">{{ avg.hex }}</button>
+        <p class="stat-name">
+            <button type="button" class="name" data-copy-text="{{ avg.descriptive_name }}" aria-label="Copy {{ avg.descriptive_name }}">{{ avg.descriptive_name }}</button>
+            {% if avg.css_name %}
+            <button type="button" class="name subtle" data-copy-text="{{ avg.css_name }}" aria-label="Copy {{ avg.css_name }}">{{ avg.css_display_name }}</button>
+            {% endif %}
+        </p>
+        <p class="stat-meta">{{ avg.count }} vote{{ 's' if avg.count != 1 else '' }}{{ scope }}</p>
+    </div>
+</article>
+{%- endmacro %}
+<div class="stats" {% if user_avg %}data-user-color="{{ user_avg.hex }}"{% endif %}>
+    {% if user_avg %}
+    {{ stat("Your Anika Blue", user_avg, "") }}
+    {% else %}
+    <article class="stat stat-empty">
+        <div class="stat-swatch is-empty" aria-hidden="true"></div>
+        <div class="stat-body">
+            <h2 class="stat-label">Your Anika Blue</h2>
+            <p class="stat-meta">Say yes to a few shades and yours shows up here.</p>
+            <button type="button" class="link" data-action="restore">Restore from another device</button>
+        </div>
+    </article>
+    {% endif %}
+
+    {% if global_avg %}
+    {{ stat("Everyone's Anika Blue", global_avg, " from everyone") }}
+    {% else %}
+    <article class="stat stat-empty">
+        <div class="stat-swatch is-empty" aria-hidden="true"></div>
+        <div class="stat-body">
+            <h2 class="stat-label">Everyone's Anika Blue</h2>
+            <p class="stat-meta">Be the first to define it.</p>
+        </div>
+    </article>
+    {% endif %}
+</div>

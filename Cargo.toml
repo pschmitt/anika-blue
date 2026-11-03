@@ -1,0 +1,35 @@
+[package]
+name = "anika-blue"
+version = "0.2.0"
+edition = "2024"
+license = "GPL-3.0-only"
+description = "Find your perfect shade of blue, one swatch at a time"
+repository = "https://github.com/pschmitt/anika-blue"
+readme = "README.md"
+
+[dependencies]
+anyhow = "1"
+axum = "0.8"
+axum-extra = { version = "0.12", features = ["cookie-signed"] }
+clap = { version = "4", features = ["derive", "env"] }
+minijinja = { version = "3", features = ["serde", "speedups"] }
+rand = "0.10"
+rusqlite = { version = "0.41", features = ["bundled"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+sha2 = "0.11"
+thiserror = "2"
+tokio = { version = "1", features = ["macros", "net", "rt-multi-thread", "signal"] }
+tower-http = { version = "0.7", features = ["compression-br", "compression-gzip"] }
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+
+[dev-dependencies]
+http-body-util = "0.1"
+tempfile = "3"
+tower = { version = "0.5", features = ["util"] }
+
+[profile.release]
+lto = "thin"
+codegen-units = 4
+strip = true
