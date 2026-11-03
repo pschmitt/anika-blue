@@ -10,7 +10,6 @@
     inputs@{
       self,
       flake-parts,
-      nixpkgs,
       ...
     }:
     flake-parts.lib.mkFlake { inherit inputs; } {
@@ -27,7 +26,6 @@
           {
             config,
             lib,
-            pkgs,
             ...
           }:
           let
@@ -112,7 +110,6 @@
         {
           self',
           pkgs,
-          system,
           ...
         }:
         let
@@ -214,7 +211,7 @@
         {
           packages = {
             default = anika-blue;
-            anika-blue = anika-blue;
+            inherit anika-blue;
             docker = dockerImage;
           };
 
