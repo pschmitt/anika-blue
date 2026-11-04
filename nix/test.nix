@@ -20,7 +20,9 @@
     machine.wait_for_unit("anika-blue.service")
     machine.wait_for_open_port(5000)
     machine.succeed("curl -sf http://127.0.0.1:5000/healthz")
-    machine.succeed("curl -sf http://127.0.0.1:5000/ | grep -q 'Is this'")
+    # Not `| grep -q`: it closes the pipe early and curl fails under pipefail.
+    page = machine.succeed("curl -sf http://127.0.0.1:5000/")
+    assert "Is this" in page, page
     machine.succeed("test -f /var/lib/anika-blue/anika_blue.db")
   '';
 }
