@@ -20,7 +20,7 @@ node --check static/app.js
 nixfmt --check flake.nix nix/*.nix && statix check . && deadnix --fail nix flake.nix
 ```
 
-Build on a remote build host, not on the machine the agent runs on.
+Build on an ad-hoc `rworker` (see the `rworker` skill) or a remote build host, not on the machine the agent runs on.
 
 ## Conventions
 
