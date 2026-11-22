@@ -29,9 +29,9 @@ jobs:
         run: |
           test -c /dev/kvm
           sudo chmod 0666 /dev/kvm
-      - uses: cachix/install-nix-action@v31
+      - uses: pschmitt/ci-workflows/.github/actions/nix-setup@main
         with:
-          extra_nix_config: |
+          extra-conf: |
             system-features = nixos-test benchmark big-parallel kvm
       - run: nix build -L '.#checks.x86_64-linux.nixos'
   # Native ARM packages publish to niks3 before the checks job consumes them.
