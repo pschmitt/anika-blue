@@ -27,8 +27,10 @@
       # Expose both Linux architectures to Circus.
       hydraJobs = nixpkgs.lib.genAttrs [ "x86_64-linux" "aarch64-linux" ] (system: {
         packages = self.packages.${system} or { };
-        # Builders have no /dev/kvm; the VM test stays on GitHub Actions.
-        checks = builtins.removeAttrs (self.checks.${system} or { }) [ "nixos" ];
+        # The ARM pool has no KVM; run the VM test on x86_64.
+        checks = builtins.removeAttrs (self.checks.${system} or { }) (
+          nixpkgs.lib.optional (system == "aarch64-linux") "nixos"
+        );
       });
 
       packages = forAllSystems (
