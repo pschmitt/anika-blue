@@ -24,6 +24,18 @@
       forAllSystems = f: nixpkgs.lib.genAttrs systems (system: f nixpkgs.legacyPackages.${system});
     in
     {
+      circus.consumerBuilds.nixos-config = {
+        repository = "pschmitt/nixos-config";
+        ref = "main";
+        input = "anika-blue";
+        follows = [
+          "nixpkgs"
+        ];
+        packages.aarch64-linux = [
+          "anika-blue"
+        ];
+      };
+
       # Expose both Linux architectures to Circus.
       hydraJobs = nixpkgs.lib.genAttrs [ "x86_64-linux" "aarch64-linux" ] (system: {
         packages = self.packages.${system} or { };
